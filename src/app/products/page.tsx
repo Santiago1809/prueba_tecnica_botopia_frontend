@@ -1,7 +1,7 @@
 'use client'
 
 import Container from '@/components/custom/Container'
-import Products from '@/components/custom/Products'
+import Products from '@/components/custom/Products/Products'
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -13,15 +13,16 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { Slider } from "@/components/ui/slider"
+import { Product } from '@/types/products'
 import { useState } from 'react'
 
-const products = [
-  { id: 1, name: "Smartphone X", price: 599, category: "Smartphones", image: "/placeholder.svg" },
-  { id: 2, name: "Laptop Pro", price: 1299, category: "Laptops", image: "/placeholder.svg" },
-  { id: 3, name: "Auriculares Inalámbricos", price: 149, category: "Audio", image: "/placeholder.svg" },
-  { id: 4, name: "Smartwatch Elite", price: 299, category: "Wearables", image: "/placeholder.svg" },
-  { id: 5, name: "Tablet Ultra", price: 449, category: "Tablets", image: "/placeholder.svg" },
-  { id: 6, name: "Cámara 4K", price: 799, category: "Cámaras", image: "/placeholder.svg" },
+const products: Product[] = [
+  { id: 1, name: "Smartphone X", price: 599, category: "Smartphones", images: ["/placeholder.svg"] },
+  { id: 2, name: "Laptop Pro", price: 1299, category: "Laptops", images: ["/placeholder.svg"] },
+  { id: 3, name: "Auriculares Inalámbricos", price: 149, category: "Audio", images: ["/placeholder.svg"] },
+  { id: 4, name: "Smartwatch Elite", price: 299, category: "Wearables", images: ["/placeholder.svg"] },
+  { id: 5, name: "Tablet Ultra", price: 449, category: "Tablets", images: ["/placeholder.svg"] },
+  { id: 6, name: "Cámara 4K", price: 799, category: "Cámaras", images: ["/placeholder.svg"] },
 ]
 
 export default function ProductsPage() {

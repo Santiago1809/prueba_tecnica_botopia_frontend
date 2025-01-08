@@ -6,14 +6,23 @@ import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import Container from "@/components/custom/Container";
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+} from "@/components/ui/carousel";
+import { Product } from "@/types/products";
 
-const product = {
+const product: Product = {
   id: 1,
   name: "Smartphone X",
   price: 599,
   description:
     "El Smartphone X es un dispositivo de última generación con características avanzadas...",
-  image: "/placeholder.svg",
+  images: ["/placeholder.svg"],
+  category: "Smartphones",
 };
 
 export default function ProductPage({ params }: { params: { id: string } }) {
@@ -34,13 +43,31 @@ export default function ProductPage({ params }: { params: { id: string } }) {
         <CardContent className="p-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             <div>
-              <Image
-                src={product.image}
-                alt={product.name}
-                width={500}
-                height={500}
-                className="rounded-lg"
-              />
+              <Carousel className="w-full max-w-md mx-auto">
+                <CarouselContent>
+                  {product.images.map((link, index) => (
+                    <CarouselItem key={index}>
+                      <div className="p-2">
+                        <Card className="border-none shadow-none">
+                          <CardContent className="flex aspect-square items-center justify-center p-0">
+                            <div className="relative w-full h-full">
+                              <Image
+                                src={link}
+                                alt={`${product.name} - Vista ${index + 1}`}
+                                fill
+                                className="object-cover rounded-lg"
+                                priority={index === 0}
+                              />
+                            </div>
+                          </CardContent>
+                        </Card>
+                      </div>
+                    </CarouselItem>
+                  ))}
+                </CarouselContent>
+                <CarouselPrevious className="left-2" />
+                <CarouselNext className="right-2" />
+              </Carousel>
             </div>
             <div>
               <h1 className="text-3xl font-bold mb-4">{product.name}</h1>

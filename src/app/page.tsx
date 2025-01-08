@@ -1,5 +1,5 @@
 import Container from "@/components/custom/Container";
-import Products from "@/components/custom/Products";
+import Products from "@/components/custom/Products/Products";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import Link from "next/link";
@@ -10,28 +10,28 @@ export default function Home() {
       id: 1,
       name: "Smartphone X",
       price: 599,
-      image: "/placeholder.svg",
+      images: ["/placeholder.svg"],
       category: "Smartphones",
     },
     {
       id: 2,
       name: "Laptop Pro",
       price: 1299,
-      image: "/placeholder.svg",
+      images: ["/placeholder.svg"],
       category: "Laptops",
     },
     {
       id: 3,
       name: "Auriculares Inalámbricos",
       price: 149,
-      image: "/placeholder.svg",
+      images: ["/placeholder.svg"],
       category: "Audio",
     },
     {
       id: 4,
       name: "Smartwatch Elite",
       price: 299,
-      image: "/placeholder.svg",
+      images: ["/placeholder.svg"],
       category: "Wearables",
     },
   ];
