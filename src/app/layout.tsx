@@ -13,7 +13,7 @@ const interSans = Inter({
 
 async function generateMetadata(): Promise<Metadata> {
   try {
-    const response = await fetch(`${BACKEND_HOST}/home`, {
+    const response = await fetch(`${BACKEND_HOST}/api/home`, {
       next: { revalidate: 3600 },
       headers: {Authorization: `Bearer ${CLIENT_TOKEN}`},
     });
@@ -23,7 +23,7 @@ async function generateMetadata(): Promise<Metadata> {
     }
 
     const { data } = await response.json();
-
+    
     return {
       title: data.page_title || 'Botoshop',
       description: data.siteDescription || 'AI assisted E-commerce platform',

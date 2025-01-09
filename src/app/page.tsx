@@ -11,28 +11,40 @@ export default function Home() {
       name: "Smartphone X",
       price: 599,
       images: ["/placeholder.svg"],
-      category: "Smartphones",
+      category: {
+        id: 1,
+        Name: "Smartphones",
+      },
     },
     {
       id: 2,
       name: "Laptop Pro",
       price: 1299,
       images: ["/placeholder.svg"],
-      category: "Laptops",
+      category: {
+        id: 2,
+        Name: "Laptops",
+      },
     },
     {
       id: 3,
       name: "Auriculares Inalámbricos",
       price: 149,
       images: ["/placeholder.svg"],
-      category: "Audio",
+      category: {
+        id: 3,
+        Name: "Audio",
+      },
     },
     {
       id: 4,
       name: "Smartwatch Elite",
       price: 299,
       images: ["/placeholder.svg"],
-      category: "Wearables",
+      category: {
+        id: 4,
+        Name: "Smartwatches",
+      },
     },
   ];
   return (

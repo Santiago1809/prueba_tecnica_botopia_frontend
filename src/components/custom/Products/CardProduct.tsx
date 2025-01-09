@@ -6,6 +6,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { CopFormatNumber } from "@/lib/utils";
 import { Product } from "@/types/products";
 import Image from "next/image";
 import Link from "next/link";
@@ -32,7 +33,7 @@ export default function CardProduct({ product }: Props) {
           {product.name}
         </CardTitle>
         <p className="text-xl sm:text-2xl font-bold text-primary">
-          ${product.price}
+          {!isNaN(product?.price as number) ? CopFormatNumber(product?.price as number) : "Loading..."}
         </p>
       </CardContent>
       <CardFooter className="px-3 sm:px-6">
