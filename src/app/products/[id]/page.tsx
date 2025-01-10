@@ -1,12 +1,9 @@
 "use client";
 
-import { use, useEffect, useState } from "react";
-import Image from "next/image";
-import { useToast } from "@/hooks/use-toast";
+import { fetchProduct, insertView } from "@/app/actions";
+import Container from "@/components/custom/Container";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import Container from "@/components/custom/Container";
-import { NEXT_PUBLIC_BACKEND_HOST } from "@/lib/constants";
 import {
   Carousel,
   CarouselContent,
@@ -14,9 +11,12 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from "@/components/ui/carousel";
-import { ExternaProductData, Product } from "@/types/products";
+import { useToast } from "@/hooks/use-toast";
 import { CopFormatNumber } from "@/lib/utils";
-import { ShoppingBag, ShoppingCart } from "lucide-react";
+import { Product } from "@/types/products";
+import { ShoppingBag, ShoppingCart, Store, Truck } from "lucide-react";
+import Image from "next/image";
+import { use, useEffect, useState } from "react";
 
 export default function ProductPage({
   params,
@@ -24,35 +24,24 @@ export default function ProductPage({
   params: Promise<{ id: string }>;
 }) {
   const resolvedParams = use(params);
-  const [product, setProduct] = useState<Product>();
+  const [product, setProduct] = useState<Product | null>();
   const id = resolvedParams.id;
   const [quantity, setQuantity] = useState(1);
   const { toast } = useToast();
 
   useEffect(() => {
-    const fetchProduct = async () => {
-      const response = await fetch(
-        `${NEXT_PUBLIC_BACKEND_HOST}/api/products/${id}?populate[Images][fields][0]=url`
-      );
-      const { data } = await response.json();
-      const info = data as ExternaProductData;
-
-      console.log(info);
-
-      const externalProduct: Product = {
-        id: info.documentId,
-        name: info.Name,
-        description: info.Description,
-        price: info.Price,
-        category: info.Category,
-        images: info.Images.map(
-          (image) => `${NEXT_PUBLIC_BACKEND_HOST}${image.url}`
-        ),
-        stock: info.Stock,
-      };
-      setProduct(externalProduct);
+    const getProduct = async () => {
+      const fetchedProduct = await fetchProduct(id);
+      if (fetchedProduct) setProduct(fetchedProduct);
+      else {
+        window.location.href = "/404";
+        return null;
+      }
     };
-    fetchProduct();
+    getProduct();
+  }, [id]);
+  useEffect(() => {
+    insertView(id);
   }, [id]);
 
   const handleAddToCart = () => {
@@ -135,39 +124,28 @@ export default function ProductPage({
               <div className="bg-gray-300 rounded-lg">
                 <p></p>
               </div>
-              <div className="flex flex-col space-y-4 mb-6">
-                <p className="font-semibold">Selecciona un color:</p>
-                <div className="flex gap-4">
-                  {['negro', 'rojo', 'azul', 'dorado', 'blanco'].map((color) => (
-                    <div key={color} className="flex items-center">
-                      <input
-                        type="radio"
-                        id={color}
-                        name="color"
-                        value={color}
-                        className="hidden peer"
-                      />
-                      <label
-                        htmlFor={color}
-                        className="px-4 py-2 border rounded-lg cursor-pointer peer-checked:bg-primary peer-checked:text-white capitalize"
-                      >
-                        {color}
-                      </label>
-                    </div>
-                  ))}
+              <div className="bg-gray-200 mb-8 text-gray-600 rounded-lg px-3 py-6 flex flex-col space-y-2">
+                Disponible para:
+                <div className="flex gap-x-6 bg-gray-400 p-2 rounded-lg text-white">
+                  <Store />
+                  Recoger en tienda
+                </div>
+                <div className="flex gap-x-6 bg-gray-400 p-2 rounded-lg text-white">
+                  <Truck />
+                  Entrega a domicilio
                 </div>
               </div>
               <div className="flex flex-col space-y-2">
                 <Button
                   onClick={handleAddToCart}
-                  className="w-full bg-orange-500 hover:bg-orange-500/90"
+                  className="w-full bg-orange-500 hover:bg-orange-500/90 transition-colors duration-300"
                 >
                   <ShoppingCart />
                   Añadir al carrito
                 </Button>
                 <Button
                   onClick={handleAddToCart}
-                  className="w-full bg-transparent hover:bg-blue-400 border border-blue-400 text-blue-400"
+                  className="w-full bg-transparent hover:bg-blue-400 border hover:text-white border-blue-400 text-blue-400 transition-colors duration-300"
                 >
                   <ShoppingBag />
                   Comprar ahora

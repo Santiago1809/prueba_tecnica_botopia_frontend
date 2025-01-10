@@ -1,0 +1,99 @@
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Slider } from "@/components/ui/slider";
+import { Category } from "@/types/products";
+
+interface ProductFiltersProps {
+  searchTerm: string;
+  setSearchTerm: (value: string) => void;
+  category: string;
+  setCategory: (value: string) => void;
+  categories: Category[];
+  priceRange: number[];
+  setPriceRange: (value: number[]) => void;
+  onFilter: () => void;
+}
+
+export default function ProductFilters({
+  searchTerm,
+  setSearchTerm,
+  category,
+  setCategory,
+  categories,
+  priceRange,
+  setPriceRange,
+  onFilter,
+}: ProductFiltersProps) {
+  return (
+    <div className="md:col-span-1">
+      <div className="space-y-2">
+        <div>
+          <Label htmlFor="search">Buscar</Label>
+          <Input
+            id="search"
+            type="search"
+            placeholder="Buscar productos..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
+        </div>
+        <div>
+          <Label htmlFor="category">Categoría</Label>
+          <Select value={category} onValueChange={setCategory}>
+            <SelectTrigger id="category">
+              <SelectValue placeholder="Seleccionar categoría" />
+            </SelectTrigger>
+            <SelectContent>
+              <div className="px-2 py-2">
+                <Input
+                  placeholder="Buscar categoría..."
+                  className="mb-2"
+                  onChange={(e) => {
+                    const input = e.target as HTMLInputElement;
+                    const items = document.querySelectorAll('[role="option"]');
+                    items.forEach((item) => {
+                      const text = item.textContent?.toLowerCase() || "";
+                      const matches = text.includes(input.value.toLowerCase());
+                      (item as HTMLElement).style.display = matches
+                        ? "block"
+                        : "none";
+                    });
+                  }}
+                />
+              </div>
+              <SelectItem value="all">Todas las categorías</SelectItem>
+              {categories.map((category) => (
+                <SelectItem key={category.id} value={category.Name}>
+                  {category.Name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+        <div>
+          <Label>Rango de precio</Label>
+          <Slider
+            min={0}
+            max={6000000}
+            step={10}
+            value={priceRange}
+            onValueChange={setPriceRange}
+          />
+          <div className="flex justify-between mt-2">
+            <span>${priceRange[0]}</span>
+            <span>${priceRange[1]}</span>
+          </div>
+        </div>
+        <Button onClick={onFilter}>Aplicar filtros</Button>
+      </div>
+    </div>
+  );
+}

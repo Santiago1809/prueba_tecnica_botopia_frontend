@@ -1,19 +1,8 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import Container from "@/components/custom/Container";
 import Products from "@/components/custom/Products/Products";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Slider } from "@/components/ui/slider";
+import ProductFilters from "@/components/custom/Products/ProductsFilter";
 import { NEXT_PUBLIC_BACKEND_HOST } from "@/lib/constants";
 import {
   Category,
@@ -21,14 +10,30 @@ import {
   ExternaProductData,
   Product,
 } from "@/types/products";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useEffect, useState } from "react";
+import { getProducts } from "../actions";
 
 export default function ProductsPage() {
-  const [_products, setProducts] = useState<Product[]>([]);
+  const router = useRouter();
+  const searchParams = useSearchParams();
   const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
-  const [priceRange, setPriceRange] = useState([0, 1500]);
+  const [priceRange, setPriceRange] = useState([0, 6000000]);
   const [category, setCategory] = useState("all");
   const [searchTerm, setSearchTerm] = useState("");
   const [categories, setCategories] = useState<Category[]>([]);
+
+  // Sync filters with URL
+  useEffect(() => {
+    const categoryParam = searchParams.get("category") || "all";
+    const searchParam = searchParams.get("search") || "";
+    const minPrice = parseInt(searchParams.get("minPrice") || "0", 10);
+    const maxPrice = parseInt(searchParams.get("maxPrice") || "6000000", 10);
+
+    setCategory(categoryParam);
+    setSearchTerm(searchParam);
+    setPriceRange([minPrice, maxPrice]);
+  }, [searchParams]);
 
   // Fetch data
   useEffect(() => {
@@ -53,28 +58,8 @@ export default function ProductsPage() {
 
     const fetchProducts = async () => {
       try {
-        const response = await fetch(
-          `${NEXT_PUBLIC_BACKEND_HOST}/api/products?populate[Images][fields][0]=url&populate[Category][fields][0]=Name`
-        );
-        if (!response.ok) throw new Error(`Error ${response.status}`);
-        const { data } = await response.json();
-        const fetchedProducts: Product[] = data.map(
-          (item: ExternaProductData) => ({
-            id: item.documentId,
-            name: item.Name,
-            price: item.Price,
-            category: {
-              documentId: item.Category.documentId,
-              id: item.Category.id,
-              Name: item.Category.Name,
-            },
-            images: item.Images.map(
-              (image) => `${NEXT_PUBLIC_BACKEND_HOST}${image.url}`
-            ),
-          })
-        );
-        setProducts(fetchedProducts);
-        setFilteredProducts(fetchedProducts);
+        const products = await getProducts()
+        setFilteredProducts(products);
       } catch (error) {
         console.error("Error fetching products:", error);
       }
@@ -86,10 +71,37 @@ export default function ProductsPage() {
 
   // Handle filters
   const handleFilter = async () => {
-   const response = await fetch(`${NEXT_PUBLIC_BACKEND_HOST}/api/products?populate[Images][fields][0]=url&populate[Category][fields][0]=Name${category==='all' ? '' : `&filters[Category][Name][$eq]=${category}`}`);
-   const {data} = await response.json();
-   const filtered: Product[] = data.map((prod: ExternaProductData) => {
-      return {
+    try {
+      const filters = [];
+
+      if (category !== "all") {
+        filters.push(
+          `filters[Category][Name][$eq]=${encodeURIComponent(category)}`
+        );
+      }
+
+      filters.push(
+        `filters[Price][$gte]=${priceRange[0]}`,
+        `filters[Price][$lte]=${priceRange[1]}`
+      );
+
+      if (searchTerm.trim()) {
+        filters.push(
+          `filters[Name][$contains]=${encodeURIComponent(searchTerm)}`
+        );
+      }
+
+      const query = filters.length > 0 ? `&${filters.join("&")}` : "";
+      const response = await fetch(
+        `${NEXT_PUBLIC_BACKEND_HOST}/api/products?populate[Images][fields][0]=url&populate[Category][fields][0]=Name${query}`
+      );
+
+      if (!response.ok) {
+        throw new Error(`Error ${response.status}`);
+      }
+
+      const { data } = await response.json();
+      const filtered: Product[] = data.map((prod: ExternaProductData) => ({
         id: prod.documentId,
         name: prod.Name,
         price: prod.Price,
@@ -98,77 +110,40 @@ export default function ProductsPage() {
           id: prod.Category.id,
           Name: prod.Category.Name,
         },
-        images: prod.Images.map((image) => `${NEXT_PUBLIC_BACKEND_HOST}${image.url}`),
-      };
-   })
-   setFilteredProducts(filtered);
-   
+        images: prod.Images.map(
+          (image) => `${NEXT_PUBLIC_BACKEND_HOST}${image.url}`
+        ),
+      }));
+
+      setFilteredProducts(filtered);
+
+      // Update URL with the current filters
+      const params = new URLSearchParams();
+      if (category !== "all") params.set("category", category);
+      if (searchTerm) params.set("search", searchTerm);
+      params.set("minPrice", priceRange[0].toString());
+      params.set("maxPrice", priceRange[1].toString());
+
+      router.push(`?${params.toString()}`);
+    } catch (error) {
+      console.error("Error applying filters:", error);
+    }
   };
 
   return (
     <Container>
       <h1 className="text-3xl font-bold mb-8">Nuestros Productos</h1>
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
-        <div className="md:col-span-1">
-          <div className="space-y-6">
-            <div>
-              <Label htmlFor="search">Buscar</Label>
-              <Input
-                id="search"
-                type="search"
-                placeholder="Buscar productos..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-              />
-            </div>
-            <div>
-              <Label htmlFor="category">Categoría</Label>
-                <Select value={category} onValueChange={setCategory}>
-                <SelectTrigger id="category">
-                  <SelectValue placeholder="Seleccionar categoría" />
-                </SelectTrigger>
-                <SelectContent>
-                  <div className="px-2 py-2">
-                  <Input
-                    placeholder="Buscar categoría..."
-                    className="mb-2"
-                    onChange={(e) => {
-                    const input = e.target as HTMLInputElement;
-                    const items = document.querySelectorAll('[role="option"]');
-                    items.forEach((item) => {
-                      const text = item.textContent?.toLowerCase() || '';
-                      const matches = text.includes(input.value.toLowerCase());
-                      (item as HTMLElement).style.display = matches ? 'block' : 'none';
-                    });
-                    }}
-                  />
-                  </div>
-                  <SelectItem value="all">Todas las categorías</SelectItem>
-                  {categories.map((category) => (
-                  <SelectItem key={category.id} value={category.Name}>
-                    {category.Name}
-                  </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-            <div>
-              <Label>Rango de precio</Label>
-              <Slider
-                min={0}
-                max={1500}
-                step={10}
-                value={priceRange}
-                onValueChange={setPriceRange}
-              />
-              <div className="flex justify-between mt-2">
-                <span>${priceRange[0]}</span>
-                <span>${priceRange[1]}</span>
-              </div>
-            </div>
-            <Button onClick={handleFilter}>Aplicar filtros</Button>
-          </div>
-        </div>
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-10">
+        <ProductFilters
+          searchTerm={searchTerm}
+          categories={categories}
+          category={category}
+          onFilter={handleFilter}
+          priceRange={priceRange}
+          setCategory={setCategory}
+          setPriceRange={setPriceRange}
+          setSearchTerm={setSearchTerm}
+        />
         <div className="md:col-span-3">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <Products products={filteredProducts} />
