@@ -40,3 +40,22 @@ export interface Image {
   documentId: string
   url: string
 }
+
+export interface ExternalMostViewedProductData {
+  id: number
+  attributes: Attributes
+}
+
+export interface Attributes {
+  documentId: string
+  Name: string
+  Description: string
+  Price: number
+  Stock: number
+  createdAt: string
+  updatedAt: string
+  publishedAt: Date | null
+  locale: string | null
+  Images: Image[]
+  viewCount: number
+}

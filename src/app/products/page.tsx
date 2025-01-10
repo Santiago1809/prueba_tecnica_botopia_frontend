@@ -12,7 +12,7 @@ import {
 } from "@/types/products";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
-import { getProducts } from "../actions";
+import { getProducts } from "../../actions/actions";
 import Loader from "@/components/Loader";
 
 export const experimental_ppr = true;
@@ -58,19 +58,47 @@ export default function ProductsPage() {
         console.error("Error fetching categories:", error);
       }
     };
+    fetchCategories();
+  }, []);
 
-    const fetchProducts = async () => {
+  useEffect(() => {
+    const fetchFilteredProducts = async () => {
+      const category = searchParams.get("category") || "all";
+      const search = searchParams.get("search") || "";
+      const minPrice = parseInt(searchParams.get("minPrice") || "0", 10);
+      const maxPrice = parseInt(searchParams.get("maxPrice") || "6000000", 10);
+
+      const filters = [];
+
+      if (category !== "all") {
+        filters.push(
+          `filters[Category][Name][$eq]=${encodeURIComponent(category)}`
+        );
+      }
+
+      filters.push(
+        `filters[Price][$gte]=${minPrice}`,
+        `filters[Price][$lte]=${maxPrice}`
+      );
+
+      if (search.trim()) {
+        filters.push(
+          `filters[Name][$contains]=${encodeURIComponent(search)}`
+        );
+      }
+
+      const query = filters.length > 0 ? `&${filters.join("&")}` : "";
+
       try {
-        const products = await getProducts();
+        const products = await getProducts(query);
         setFilteredProducts(products);
       } catch (error) {
-        console.error("Error fetching products:", error);
+        console.error("Error fetching filtered products:", error);
       }
     };
 
-    fetchCategories();
-    fetchProducts();
-  }, []);
+    fetchFilteredProducts();
+  }, [searchParams]);
 
   // Handle filters
   const handleFilter = async () => {

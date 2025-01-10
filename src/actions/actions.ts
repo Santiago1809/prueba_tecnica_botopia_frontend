@@ -1,6 +1,10 @@
 "use server";
 import { BACKEND_HOST } from "@/lib/constants";
-import { ExternaProductData, Product } from "@/types/products";
+import {
+  ExternalMostViewedProductData,
+  ExternaProductData,
+  Product,
+} from "@/types/products";
 import { getOrCreateSessionId } from "@/utils/session";
 
 export const insertView = async (id: string) => {
@@ -19,14 +23,14 @@ export const insertView = async (id: string) => {
   });
 };
 
-export const getProducts = async () => {
+export const getProducts = async (query = "") => {
   try {
     const response = await fetch(
-      `${BACKEND_HOST}/api/products?populate[Images][fields][0]=url&populate[Category][fields][0]=Name`
+      `${BACKEND_HOST}/api/products?populate[Images][fields][0]=url&populate[Category][fields][0]=Name${query}`
     );
     if (!response.ok) throw new Error(`Error ${response.status}`);
     const { data } = await response.json();
-    const fetchedProducts: Product[] = data.map((item: ExternaProductData) => ({
+    const fetchedProducts = data.map((item: ExternaProductData) => ({
       id: item.documentId,
       name: item.Name,
       price: item.Price,
@@ -67,3 +71,29 @@ export const fetchProduct = async (id: string) => {
     return null;
   }
 };
+
+export async function getMostViewedProducts() {
+  try {
+    const response = await fetch(
+      `${BACKEND_HOST}/api/get-most-viewed-products`
+    );
+    if (!response.ok) throw new Error(`Error ${response.status}`);
+    const { data } = await response.json();
+    const fetchedProducts: Product[] = data.map(
+      (item: ExternalMostViewedProductData) => ({
+        id: item.attributes.documentId,
+        name: item.attributes.Name,
+        price: item.attributes.Price,
+        images: item.attributes.Images.map(
+          (image) => `${BACKEND_HOST}${image.url}`
+        ),
+      })
+    );
+    console.log(fetchedProducts);
+
+    return fetchedProducts;
+  } catch (error) {
+    console.error("Error fetching most viewed products:", error);
+    return null;
+  }
+}
