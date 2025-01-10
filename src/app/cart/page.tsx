@@ -1,60 +1,68 @@
-'use client'
+"use client";
 
-import { useState } from 'react'
-import Image from 'next/image'
-import Link from 'next/link'
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import Container from '@/components/custom/Container'
-
-const initialCartItems = [
-  { id: 1, name: "Smartphone X", price: 599, quantity: 1, image: "/placeholder.svg" },
-  { id: 2, name: "Laptop Pro", price: 1299, quantity: 1, image: "/placeholder.svg" },
-]
+import Image from "next/image";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import Container from "@/components/custom/Container";
+import { useShoppingCart } from "@/hooks/useCart";
+import { CopFormatNumber } from "@/lib/utils";
+import { X } from "lucide-react";
 
 export default function CartPage() {
-  const [cartItems, setCartItems] = useState(initialCartItems)
+  const { cart, updateQuantity, removeItem, totalPrice } = useShoppingCart();
 
-  const updateQuantity = (id: number, newQuantity: number) => {
-    setCartItems(cartItems.map(item => 
-      item.id === id ? { ...item, quantity: Math.max(1, newQuantity) } : item
-    ))
-  }
-
-  const removeItem = (id: number) => {
-    setCartItems(cartItems.filter(item => item.id !== id))
-  }
-
-  const total = cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0)
+  const handleUpdateQuantity = (id: string, newQuantity: number) => {
+    if (newQuantity >= 1) {
+      // Prevenir cantidades negativas
+      updateQuantity(id, newQuantity);
+    }
+  };
 
   return (
     <Container>
       <h1 className="text-3xl font-bold mb-8">Carrito de Compra</h1>
-      {cartItems.length === 0 ? (
+      {cart.length === 0 ? (
         <>
-        <p>Tu carrito está vacío.</p>
-        <Button className="mt-4" asChild>
-          <Link href="/products">Ir a comprar</Link>
-        </Button>
+          <p>Tu carrito está vacío.</p>
+          <Button className="mt-4" asChild>
+            <Link href="/products">Ir a comprar</Link>
+          </Button>
         </>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           <div className="md:col-span-2">
-            {cartItems.map((item) => (
+            {cart.map((item) => (
               <Card key={item.id} className="mb-4">
                 <CardContent className="p-4">
                   <div className="flex items-center space-x-4">
-                    <Image src={item.image} alt={item.name} width={80} height={80} className="rounded-md" />
+                    <Image
+                      src={item.imageUrl as string}
+                      alt={item.name}
+                      width={80}
+                      height={80}
+                      className="rounded-md"
+                    />
                     <div className="flex-grow">
                       <CardTitle>{item.name}</CardTitle>
-                      <p className="text-lg font-semibold text-primary">${item.price}</p>
+                      <p className="text-lg font-semibold text-primary">
+                        {CopFormatNumber(item.price)}
+                      </p>
                     </div>
                     <div className="flex items-center space-x-2">
                       <Button
                         variant="outline"
                         size="icon"
-                        onClick={() => updateQuantity(item.id, item.quantity - 1)}
+                        onClick={() =>
+                          handleUpdateQuantity(item.id, item.quantity - 1)
+                        }
                       >
                         -
                       </Button>
@@ -62,19 +70,30 @@ export default function CartPage() {
                         type="number"
                         min="1"
                         value={item.quantity}
-                        onChange={(e) => updateQuantity(item.id, parseInt(e.target.value))}
+                        onChange={(e) =>
+                          handleUpdateQuantity(
+                            item.id,
+                            parseInt(e.target.value) || 1
+                          )
+                        }
                         className="w-16 text-center"
                       />
                       <Button
                         variant="outline"
                         size="icon"
-                        onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                        onClick={() =>
+                          handleUpdateQuantity(item.id, item.quantity + 1)
+                        }
                       >
                         +
                       </Button>
                     </div>
-                    <Button variant="destructive" size="icon" onClick={() => removeItem(item.id)}>
-                      X
+                    <Button
+                      size="icon"
+                      className="rounded-full p-3 bg-transparent text-red-500 border border-red-500 hover:bg-red-500 hover:text-white"
+                      onClick={() => removeItem(item.id)}
+                    >
+                      <X />
                     </Button>
                   </div>
                 </CardContent>
@@ -89,7 +108,7 @@ export default function CartPage() {
               <CardContent>
                 <div className="flex justify-between mb-2">
                   <span>Subtotal:</span>
-                  <span>${total.toFixed(2)}</span>
+                  <span>{CopFormatNumber(totalPrice)}</span>
                 </div>
                 <div className="flex justify-between mb-2">
                   <span>Envío:</span>
@@ -97,7 +116,7 @@ export default function CartPage() {
                 </div>
                 <div className="flex justify-between font-bold text-lg">
                   <span>Total:</span>
-                  <span>${total.toFixed(2)}</span>
+                  <span>{CopFormatNumber(totalPrice)}</span>
                 </div>
               </CardContent>
               <CardFooter>
@@ -110,6 +129,5 @@ export default function CartPage() {
         </div>
       )}
     </Container>
-  )
+  );
 }
-

@@ -1,3 +1,4 @@
+"use client";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -6,8 +7,11 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { useToast } from "@/hooks/use-toast";
+import { useShoppingCart } from "@/hooks/useCart";
 import { CopFormatNumber } from "@/lib/utils";
 import { Product } from "@/types/products";
+import { ShoppingCart } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -15,8 +19,24 @@ interface Props {
   product: Product;
 }
 export default function CardProduct({ product }: Props) {
+  const { addItem } = useShoppingCart();
+  const { toast } = useToast();
+
+  const handleAddToCart = () => {
+    addItem({
+      id: product.id as string,
+      name: product.name,
+      price: product.price,
+      imageUrl: product.images[0],
+      quantity: 1,
+    });
+    toast({
+      title: "Producto añadido al carrito",
+      description: `${product?.name} añadido al carrito.`,
+    });
+  };
   return (
-    <Card className="h-[400px] sm:h-96 max-w-34 flex flex-col">
+    <Card className="h-[22rem] sm:h-[28rem] max-w-34 flex flex-col">
       <CardHeader className="p-2 sm:p-6">
         <div className="relative w-full h-[150px] sm:h-[200px]">
           <Image
@@ -33,12 +53,21 @@ export default function CardProduct({ product }: Props) {
           {product.name}
         </CardTitle>
         <p className="text-xl sm:text-2xl font-bold text-primary">
-          {!isNaN(product?.price as number) ? CopFormatNumber(product?.price as number) : "Loading..."}
+          {!isNaN(product?.price as number)
+            ? CopFormatNumber(product?.price as number)
+            : "Loading..."}
         </p>
       </CardContent>
-      <CardFooter className="px-3 sm:px-6">
+      <CardFooter className="flex flex-col px-3 sm:px-6 gap-y-3">
         <Button asChild className="w-full">
           <Link href={`/products/${product.id}`}>Ver detalles</Link>
+        </Button>
+        <Button
+          className="bg-orange-500 hover:bg-orange-600 w-full"
+          onClick={handleAddToCart}
+        >
+          <ShoppingCart />
+          Añadir al carrito
         </Button>
       </CardFooter>
     </Card>

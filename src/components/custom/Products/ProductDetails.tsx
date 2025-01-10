@@ -10,11 +10,13 @@ import {
   CarouselPrevious,
 } from "@/components/ui/carousel";
 import { useToast } from "@/hooks/use-toast";
+import { useShoppingCart } from "@/hooks/useCart";
 import { CopFormatNumber } from "@/lib/utils";
 import { Product } from "@/types/products";
 import { ShoppingBag, ShoppingCart, Store, Truck } from "lucide-react";
 import Image from "next/image";
 import { useState } from "react";
+import Markdown from "react-markdown";
 
 interface Props {
   product: Product;
@@ -23,8 +25,16 @@ interface Props {
 export default function ProductDetails({ product }: Props) {
   const { toast } = useToast();
   const [quantity, setQuantity] = useState(1);
+  const { addItem } = useShoppingCart();
   const handleAddToCart = () => {
     // Aquí iría la lógica para añadir al carrito
+    addItem({
+      id: product.id as string,
+      name: product.name,
+      price: product.price,
+      imageUrl: product.images[0],
+      quantity,
+    });
     toast({
       title: "Producto añadido al carrito",
       description: `${quantity} x ${product?.name} añadido al carrito.`,
@@ -134,7 +144,9 @@ export default function ProductDetails({ product }: Props) {
           </div>
         </CardContent>
       </Card>
-      <p className="text-gray-600 my-6">{product?.description}</p>
+      <Markdown className="text-gray-600 my-6">
+        {product?.description}
+      </Markdown>
     </>
   );
 }
