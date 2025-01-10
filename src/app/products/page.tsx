@@ -14,6 +14,8 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { getProducts } from "../actions";
 
+export const experimental_ppr = true
+
 export default function ProductsPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -146,6 +148,7 @@ export default function ProductsPage() {
         />
         <div className="md:col-span-3">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            
             <Products products={filteredProducts} />
           </div>
         </div>
