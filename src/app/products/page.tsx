@@ -13,13 +13,14 @@ import {
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { getProducts } from "../actions";
+import Loader from "@/components/Loader";
 
-export const experimental_ppr = true
+export const experimental_ppr = true;
 
 export default function ProductsPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
+  const [filteredProducts, setFilteredProducts] = useState<Product[] | null>();
   const [priceRange, setPriceRange] = useState([0, 6000000]);
   const [category, setCategory] = useState("all");
   const [searchTerm, setSearchTerm] = useState("");
@@ -60,7 +61,7 @@ export default function ProductsPage() {
 
     const fetchProducts = async () => {
       try {
-        const products = await getProducts()
+        const products = await getProducts();
         setFilteredProducts(products);
       } catch (error) {
         console.error("Error fetching products:", error);
@@ -146,12 +147,17 @@ export default function ProductsPage() {
           setPriceRange={setPriceRange}
           setSearchTerm={setSearchTerm}
         />
-        <div className="md:col-span-3">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            
-            <Products products={filteredProducts} />
+        {filteredProducts ? (
+          <div className="md:col-span-3">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <Products products={filteredProducts} />
+            </div>
           </div>
-        </div>
+        ) : (
+          <div className="md:col-span-3 flex items-center justify-center h-96">
+            <Loader size="lg" />
+          </div>
+        )}
       </div>
     </Container>
   );

@@ -52,23 +52,6 @@ export default function ProductFilters({
               <SelectValue placeholder="Seleccionar categoría" />
             </SelectTrigger>
             <SelectContent>
-              <div className="px-2 py-2">
-                <Input
-                  placeholder="Buscar categoría..."
-                  className="mb-2"
-                  onChange={(e) => {
-                    const input = e.target as HTMLInputElement;
-                    const items = document.querySelectorAll('[role="option"]');
-                    items.forEach((item) => {
-                      const text = item.textContent?.toLowerCase() || "";
-                      const matches = text.includes(input.value.toLowerCase());
-                      (item as HTMLElement).style.display = matches
-                        ? "block"
-                        : "none";
-                    });
-                  }}
-                />
-              </div>
               <SelectItem value="all">Todas las categorías</SelectItem>
               {categories.map((category) => (
                 <SelectItem key={category.id} value={category.Name}>
