@@ -111,7 +111,7 @@ export default function ProfilePage() {
       });
       setIsLoading(false);
     }, 1000);
-  }, [profileForm]);
+  }, [profileForm, isLoggedIn]);
 
   function onProfileSubmit(data: ProfileValues) {
     setIsSaving(true);
