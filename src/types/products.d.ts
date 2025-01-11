@@ -58,4 +58,5 @@ export interface Attributes {
   locale: string | null
   Images: Image[]
   viewCount: number
+  Category: Category
 }

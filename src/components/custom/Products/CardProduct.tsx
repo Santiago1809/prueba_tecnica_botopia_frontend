@@ -75,7 +75,7 @@ export default function CardProduct({ product }: Props) {
       </CardContent>
       <CardFooter className="flex flex-col px-3 sm:px-6 gap-y-3">
         <Button asChild className="w-full">
-          <Link href={`/products/${product.id}`}>Ver detalles</Link>
+          <Link href={`/products/${product.category.Name}/${product.id}`}>Ver detalles</Link>
         </Button>
         <Button
           className="bg-orange-500 hover:bg-orange-600 w-full"

@@ -10,6 +10,7 @@ interface AuthStore {
   setToken: (value: string) => void;
   name: string
   setName: (value: string) => void;
+  logOut: () => void;
 }
 
 export const useAuthStore = create<AuthStore>()(
@@ -23,6 +24,10 @@ export const useAuthStore = create<AuthStore>()(
       setToken: (value) => set({ token: value }),
       name: "",
       setName: (value) => set({ name: value }),
+      logOut: () => {
+        set({ isLoggedIn: false, auth: false, token: "", name: "" });
+        window.location.href = '/';
+      },
     }),
     {
       name: "auth-storage", // Nombre clave en localStorage

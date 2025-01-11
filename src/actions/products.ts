@@ -87,6 +87,7 @@ export async function getMostViewedProducts() {
         images: item.attributes.Images.map(
           (image) => `${BACKEND_HOST}${image.url}`
         ),
+        category: item.attributes.Category,
       })
     );
 
