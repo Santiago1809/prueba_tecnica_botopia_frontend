@@ -1,40 +1,23 @@
+"use client";
+import { getMostViewedProducts } from "@/actions/products";
 import Container from "@/components/custom/Container";
-import Products from "@/components/custom/Products";
+import Products from "@/components/custom/Products/Products";
+import Loader from "@/components/Loader";
 import { Button } from "@/components/ui/button";
+import { Product } from "@/types/products";
 import Image from "next/image";
 import Link from "next/link";
+import { useEffect, useState } from "react";
 
 export default function Home() {
-  const featuredProducts = [
-    {
-      id: 1,
-      name: "Smartphone X",
-      price: 599,
-      image: "/placeholder.svg",
-      category: "Smartphones",
-    },
-    {
-      id: 2,
-      name: "Laptop Pro",
-      price: 1299,
-      image: "/placeholder.svg",
-      category: "Laptops",
-    },
-    {
-      id: 3,
-      name: "Auriculares Inalámbricos",
-      price: 149,
-      image: "/placeholder.svg",
-      category: "Audio",
-    },
-    {
-      id: 4,
-      name: "Smartwatch Elite",
-      price: 299,
-      image: "/placeholder.svg",
-      category: "Wearables",
-    },
-  ];
+  const [featuredProducts, setFeaturedProducts] = useState<Product[] | null>();
+  useEffect(() => {
+    (async () => {
+      const products = getMostViewedProducts();
+      setFeaturedProducts(await products);
+    })();
+  }, []);
+
   return (
     <Container>
       <section className="mb-12">
@@ -60,9 +43,15 @@ export default function Home() {
 
       <section>
         <h2 className="text-3xl font-bold mb-6">Productos destacados</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          <Products products={featuredProducts} />
-        </div>
+        {featuredProducts ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <Products products={featuredProducts} />
+          </div>
+        ) : (
+          <div>
+            <Loader size="md" />
+          </div>
+        )}
       </section>
     </Container>
   );
