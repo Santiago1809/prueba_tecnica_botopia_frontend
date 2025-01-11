@@ -12,7 +12,7 @@ import {
 } from "@/types/products";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
-import { getProducts } from "../../actions/actions";
+import { getProducts } from "../../actions/products";
 import Loader from "@/components/Loader";
 
 export const experimental_ppr = true;
@@ -82,9 +82,7 @@ export default function ProductsPage() {
       );
 
       if (search.trim()) {
-        filters.push(
-          `filters[Name][$contains]=${encodeURIComponent(search)}`
-        );
+        filters.push(`filters[Name][$contains]=${encodeURIComponent(search)}`);
       }
 
       const query = filters.length > 0 ? `&${filters.join("&")}` : "";

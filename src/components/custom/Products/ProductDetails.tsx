@@ -10,8 +10,8 @@ import {
   CarouselPrevious,
 } from "@/components/ui/carousel";
 import { useToast } from "@/hooks/use-toast";
-import { useShoppingCart } from "@/hooks/useCart";
 import { CopFormatNumber } from "@/lib/utils";
+import { useCartStore } from "@/store/cartStore";
 import { Product } from "@/types/products";
 import { ShoppingBag, ShoppingCart, Store, Truck } from "lucide-react";
 import Image from "next/image";
@@ -25,7 +25,7 @@ interface Props {
 export default function ProductDetails({ product }: Props) {
   const { toast } = useToast();
   const [quantity, setQuantity] = useState(1);
-  const { addItem } = useShoppingCart();
+  const { addItem } = useCartStore();
   const handleAddToCart = () => {
     // Aquí iría la lógica para añadir al carrito
     addItem({

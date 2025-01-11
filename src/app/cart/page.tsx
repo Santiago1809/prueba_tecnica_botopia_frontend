@@ -12,37 +12,42 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import Container from "@/components/custom/Container";
-import { useShoppingCart } from "@/hooks/useCart";
+
 import { CopFormatNumber } from "@/lib/utils";
 import { X } from "lucide-react";
+import { useCartStore } from "@/store/cartStore";
 
 export default function CartPage() {
-  const { cart, updateQuantity, removeItem, totalPrice } = useShoppingCart();
+  const {cart, updateQuantity, removeItem, totalPrice} = useCartStore()
 
   const handleUpdateQuantity = (id: string, newQuantity: number) => {
     if (newQuantity >= 1) {
-      // Prevenir cantidades negativas
       updateQuantity(id, newQuantity);
     }
   };
 
   return (
     <Container>
-      <h1 className="text-3xl font-bold mb-8">Carrito de Compra</h1>
+      <h1 className="text-3xl font-bold mb-8 text-center sm:text-left">
+        Carrito de Compra
+      </h1>
       {cart.length === 0 ? (
         <>
-          <p>Tu carrito está vacío.</p>
-          <Button className="mt-4" asChild>
-            <Link href="/products">Ir a comprar</Link>
-          </Button>
+          <p className="text-center text-lg mb-4">Tu carrito está vacío.</p>
+          <div className="flex justify-center">
+            <Button className="mt-4" asChild>
+              <Link href="/products">Ir a comprar</Link>
+            </Button>
+          </div>
         </>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          <div className="md:col-span-2">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          {/* Productos en el carrito */}
+          <div className="lg:col-span-2">
             {cart.map((item) => (
               <Card key={item.id} className="mb-4">
                 <CardContent className="p-4">
-                  <div className="flex items-center space-x-4">
+                  <div className="flex flex-col sm:flex-row items-start sm:items-center space-y-4 sm:space-y-0 sm:space-x-4">
                     <Image
                       src={item.imageUrl as string}
                       alt={item.name}
@@ -51,7 +56,9 @@ export default function CartPage() {
                       className="rounded-md"
                     />
                     <div className="flex-grow">
-                      <CardTitle>{item.name}</CardTitle>
+                      <CardTitle className="text-lg mb-2">
+                        {item.name}
+                      </CardTitle>
                       <p className="text-lg font-semibold text-primary">
                         {CopFormatNumber(item.price)}
                       </p>
@@ -76,7 +83,7 @@ export default function CartPage() {
                             parseInt(e.target.value) || 1
                           )
                         }
-                        className="w-16 text-center"
+                        className="w-12 sm:w-16 text-center"
                       />
                       <Button
                         variant="outline"
@@ -90,7 +97,7 @@ export default function CartPage() {
                     </div>
                     <Button
                       size="icon"
-                      className="rounded-full p-3 bg-transparent text-red-500 border border-red-500 hover:bg-red-500 hover:text-white"
+                      className="rounded-full p-3 bg-transparent text-red-500 border border-red-500 hover:bg-red-500 hover:text-white sm:ml-2"
                       onClick={() => removeItem(item.id)}
                     >
                       <X />
@@ -100,6 +107,7 @@ export default function CartPage() {
               </Card>
             ))}
           </div>
+          {/* Resumen del pedido */}
           <div>
             <Card>
               <CardHeader>

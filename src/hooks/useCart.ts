@@ -1,14 +1,24 @@
-'use client'
+"use client";
 import { CartItem, UseShoppingCart } from "@/types/cart";
 import { useEffect, useState } from "react";
 
 const useShoppingCart = (): UseShoppingCart => {
   const [cart, setCart] = useState<CartItem[]>(() => {
-    const savedCart = localStorage.getItem("shopping-cart");
-    return savedCart ? JSON.parse(savedCart) : [];
+    try {
+      const savedCart = localStorage.getItem("shopping-cart");
+      return savedCart ? JSON.parse(savedCart) : [];
+    } catch (error) {
+      console.error("Error loading cart from localStorage", error);
+      return [];
+    }
   });
+
   useEffect(() => {
-    localStorage.setItem("shopping-cart", JSON.stringify(cart));
+    try {
+      localStorage.setItem("shopping-cart", JSON.stringify(cart));
+    } catch (error) {
+      console.error("Error saving cart to localStorage", error);
+    }
   }, [cart]);
 
   const addItem = (item: CartItem) => {
@@ -16,30 +26,29 @@ const useShoppingCart = (): UseShoppingCart => {
       const existingItem = currentCart.find(
         (cartItem) => cartItem.id === item.id
       );
-
+  
       if (existingItem) {
-        // Si el item ya existe, incrementar la cantidad
+        // Incrementar cantidad si ya existe
         return currentCart.map((cartItem) =>
           cartItem.id === item.id
             ? { ...cartItem, quantity: cartItem.quantity + item.quantity }
             : cartItem
         );
       }
-
-      // Si es un item nuevo, añadirlo con cantidad 1
+  
+      // Agregar nuevo producto
       return [...currentCart, { ...item, quantity: item.quantity }];
     });
   };
+    
 
   const removeItem = (itemId: string) => {
     setCart((currentCart) => currentCart.filter((item) => item.id !== itemId));
   };
 
   const updateQuantity = (itemId: string, quantity: number) => {
-    if (quantity < 0) return;
-
     setCart((currentCart) => {
-      if (quantity === 0) {
+      if (quantity <= 0) {
         return currentCart.filter((item) => item.id !== itemId);
       }
 

@@ -8,8 +8,8 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
-import { useShoppingCart } from "@/hooks/useCart";
 import { CopFormatNumber } from "@/lib/utils";
+import { useCartStore } from "@/store/cartStore";
 import { Product } from "@/types/products";
 import { ShoppingCart } from "lucide-react";
 import Image from "next/image";
@@ -19,10 +19,23 @@ interface Props {
   product: Product;
 }
 export default function CardProduct({ product }: Props) {
-  const { addItem } = useShoppingCart();
+  const { addItem } = useCartStore();
   const { toast } = useToast();
 
   const handleAddToCart = () => {
+    if (
+      !product?.id ||
+      !product?.name ||
+      !product?.price ||
+      !product?.images?.[0]
+    ) {
+      toast({
+        title: "Error",
+        description: "El producto no tiene información válida.",
+      });
+      return;
+    }
+
     addItem({
       id: product.id as string,
       name: product.name,
@@ -30,11 +43,13 @@ export default function CardProduct({ product }: Props) {
       imageUrl: product.images[0],
       quantity: 1,
     });
+
     toast({
       title: "Producto añadido al carrito",
-      description: `${product?.name} añadido al carrito.`,
+      description: `${product.name} añadido al carrito.`,
     });
   };
+
   return (
     <Card className="h-[22rem] sm:h-[28rem] max-w-34 flex flex-col">
       <CardHeader className="p-2 sm:p-6">

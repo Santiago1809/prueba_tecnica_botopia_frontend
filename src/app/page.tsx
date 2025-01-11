@@ -1,5 +1,5 @@
 "use client";
-import { getMostViewedProducts } from "@/actions/actions";
+import { getMostViewedProducts } from "@/actions/products";
 import Container from "@/components/custom/Container";
 import Products from "@/components/custom/Products/Products";
 import Loader from "@/components/Loader";
@@ -43,18 +43,15 @@ export default function Home() {
 
       <section>
         <h2 className="text-3xl font-bold mb-6">Productos destacados</h2>
-        {
-          featuredProducts ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-              <Products products={featuredProducts} />
-            </div>
-
-          ) : (
-            <div>
-              <Loader size="md" />
-            </div>
-          )
-        }
+        {featuredProducts ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <Products products={featuredProducts} />
+          </div>
+        ) : (
+          <div>
+            <Loader size="md" />
+          </div>
+        )}
       </section>
     </Container>
   );

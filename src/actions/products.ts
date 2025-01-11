@@ -89,7 +89,6 @@ export async function getMostViewedProducts() {
         ),
       })
     );
-    console.log(fetchedProducts);
 
     return fetchedProducts;
   } catch (error) {

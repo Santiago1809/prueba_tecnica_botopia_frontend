@@ -1,6 +1,6 @@
 "use client";
 
-import { fetchProduct, insertView } from "@/actions/actions";
+import { fetchProduct, insertView } from "@/actions/products";
 import Container from "@/components/custom/Container";
 import ProductDetails from "@/components/custom/Products/ProductDetails";
 import Loader from "@/components/Loader";
