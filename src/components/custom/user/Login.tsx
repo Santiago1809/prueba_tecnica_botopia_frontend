@@ -62,7 +62,7 @@ export default function Login() {
           </Button>
           <span className="text-center text-sm">
             No tiene cuenta?{" "}
-            <Link href="/register" className="text-blue-500 hover:underline">
+            <Link href="/register" className="text-blue-500 hover:underline" onClick={() => setIsOpen(false)}>
               Registrese
             </Link>
           </span>
