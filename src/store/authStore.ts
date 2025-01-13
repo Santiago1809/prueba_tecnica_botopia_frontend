@@ -26,7 +26,6 @@ export const useAuthStore = create<AuthStore>()(
       setName: (value) => set({ name: value }),
       logOut: () => {
         set({ isLoggedIn: false, auth: false, token: "", name: "" });
-        window.location.href = '/';
       },
     }),
     {

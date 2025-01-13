@@ -21,13 +21,14 @@ export default function Login() {
     async (prevState: unknown, queryData: FormData) => {
       const res = await login(prevState, queryData);
       if (!res) {
-        console.log("Error al iniciar sesión");
+        return "Credenciales incorrectas";
+      } else {
+        setIsLoggedIn(true);
+        setToken(res?.jwt);
+        setAuth(res?.user?.user_role === "ADMIN");
+        setName(res?.user?.username);
+        setIsOpen(false);
       }
-      setIsLoggedIn(true);
-      setToken(res?.jwt);
-      setAuth(res?.user?.user_role === "ADMIN");
-      setName(res?.user?.username);
-      setIsOpen(false);
     },
     null
   );
@@ -49,6 +50,7 @@ export default function Login() {
           autoComplete="off"
           action={formAction}
         >
+          {_state && <p className="text-red-500 text-sm">{_state}</p>}
           <div className="grid gap-2">
             <Label htmlFor="email">Email</Label>
             <Input id="email" type="email" name="identifier" />

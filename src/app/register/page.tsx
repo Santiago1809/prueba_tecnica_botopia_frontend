@@ -1,12 +1,15 @@
 "use client";
 
-import { useActionState } from "react";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
-import * as z from "zod";
+import { register } from "@/actions/users";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import {
   Form,
   FormControl,
@@ -16,23 +19,25 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { useAuthStore } from "@/store/authStore";
+import { zodResolver } from "@hookform/resolvers/zod";
 import Link from "next/link";
+import { useActionState } from "react";
+import { useForm } from "react-hook-form";
+import * as z from "zod";
 
 const registerSchema = z
   .object({
+    display_name: z
+      .string()
+      .min(3, "El nombre debe tener al menos 3 caracteres")
+      .max(70, "El nombre no puede exceder los 70 caracteres"),
     username: z
       .string()
       .min(3, "El nombre de usuario debe tener al menos 3 caracteres")
-      .max(50, "El nombre de usuario no puede exceder los 50 caracteres"),
+      .max(15, "el nombre de usuario no puede exceder los 15 caracteres"),
     email: z.string().email("Ingresa un correo electrónico válido"),
     password: z
       .string()
@@ -40,10 +45,6 @@ const registerSchema = z
     confirmPassword: z
       .string()
       .min(8, "La confirmación de contraseña debe tener al menos 8 caracteres"),
-    address: z
-      .string()
-      .min(10, "La dirección debe tener al menos 10 caracteres")
-      .max(200, "La dirección no puede exceder los 200 caracteres"),
   })
   .refine((data) => data.password === data.confirmPassword, {
     message: "Las contraseñas no coinciden",
@@ -54,42 +55,45 @@ type RegisterValues = z.infer<typeof registerSchema>;
 
 export default function RegisterPage() {
   const { toast } = useToast();
+  const { setName, setAuth, setIsLoggedIn, setToken } = useAuthStore();
+
   const [error, registerAction, isPending] = useActionState(
     async (prevState: string | null, formData: FormData) => {
-      // Simulamos una petición al backend
-      await new Promise((resolve) => setTimeout(resolve, 2000));
+      const response = await register(prevState, formData);
 
-      // Aquí iría la lógica real para registrar al usuario
-      console.log(Object.fromEntries(formData));
+      if (response?.error) {
+        return response.error;
+      }
 
-      // Simulamos un registro exitoso
+      if (!response?.jwt || !response?.userData) {
+        return "Error en el proceso de registro";
+      }
+
+      setIsLoggedIn(true);
+      setAuth(response.userData.user_role === "ADMIN");
+      setToken(response.jwt);
+      setName(response.userData.username);
+
       toast({
         title: "Registro exitoso",
-        description:
-          "Tu cuenta ha sido creada. Te hemos enviado un correo de confirmación.",
+        description: "Tu cuenta ha sido creada!",
       });
 
-      return null; // Retornamos null si no hay error
+      window.location.href = "/";
+      return null;
     },
-    null // Estado inicial del error
+    null
   );
 
   const form = useForm<RegisterValues>({
     resolver: zodResolver(registerSchema),
     defaultValues: {
+      display_name: "",
       username: "",
       email: "",
       password: "",
-      confirmPassword: "",
-      address: "",
     },
   });
-
-  const onSubmit = (data: RegisterValues) => {
-    const formData = new FormData();
-    Object.entries(data).forEach(([key, value]) => formData.append(key, value));
-    registerAction(formData);
-  };
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -102,16 +106,36 @@ export default function RegisterPage() {
         </CardHeader>
         <CardContent>
           <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6" autoComplete="off">
+            <form
+              action={registerAction}
+              className="space-y-6"
+              autoComplete="off"
+            >
               <FormField
                 control={form.control}
-                name="username"
+                name="display_name"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Nombre completo</FormLabel>
                     <FormControl>
                       <Input {...field} placeholder="John Doe" />
                     </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                name="username"
+                control={form.control}
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Nombre de usuario</FormLabel>
+                    <FormControl>
+                      <Input {...field} placeholder="john_doe" />
+                    </FormControl>
+                    <FormDescription>
+                      Este será tu identificador único como usuario
+                    </FormDescription>
                     <FormMessage />
                   </FormItem>
                 )}
@@ -162,26 +186,6 @@ export default function RegisterPage() {
                     <FormControl>
                       <Input {...field} type="password" />
                     </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="address"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Dirección</FormLabel>
-                    <FormControl>
-                      <Textarea
-                        {...field}
-                        placeholder="Calle, número, código postal, ciudad, país"
-                        className="resize-none"
-                      />
-                    </FormControl>
-                    <FormDescription>
-                      Esta será tu dirección de envío predeterminada.
-                    </FormDescription>
                     <FormMessage />
                   </FormItem>
                 )}
