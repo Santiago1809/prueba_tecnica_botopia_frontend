@@ -20,6 +20,8 @@ import { useCartStore } from "@/store/cartStore";
 export default function CartPage() {
   const {cart, updateQuantity, removeItem, totalPrice} = useCartStore()
 
+  const costOfSending = totalPrice > 150000 ? 0 : totalPrice*0.15
+
   const handleUpdateQuantity = (id: string, newQuantity: number) => {
     if (newQuantity >= 1) {
       updateQuantity(id, newQuantity);
@@ -120,11 +122,11 @@ export default function CartPage() {
                 </div>
                 <div className="flex justify-between mb-2">
                   <span>Envío:</span>
-                  <span>Gratis</span>
+                  <span>{CopFormatNumber(costOfSending)}</span>
                 </div>
                 <div className="flex justify-between font-bold text-lg">
                   <span>Total:</span>
-                  <span>{CopFormatNumber(totalPrice)}</span>
+                  <span>{CopFormatNumber(totalPrice + costOfSending)}</span>
                 </div>
               </CardContent>
               <CardFooter>
