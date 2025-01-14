@@ -86,7 +86,7 @@ type CheckoutValues = z.infer<typeof checkoutSchema>;
 
 export default function CheckoutPage() {
   const { totalPrice, cart, clearCart } = useCartStore();
-  const costOfSending = totalPrice > 150000 ? 0 : 10000;
+  const costOfSending = totalPrice > 150000 ? 0 : totalPrice * 0.35;
   const { toast } = useToast();
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -114,10 +114,11 @@ export default function CheckoutPage() {
         cart: cart.map((item) => {
           return {
             ...item,
-            price: item.price * 100
-          }
-         }),
+            price: item.price * 100,
+          };
+        }),
         sendingData: data,
+        costOfSending,
       }),
       headers: {
         "Content-Type": "application/json",
@@ -125,8 +126,8 @@ export default function CheckoutPage() {
     })
       .then((res) => res.json())
       .then((data) => {
-        clearCart()
-        window.location = data.url
+        clearCart();
+        window.location = data.url;
         toast({
           title: "Pago exitoso",
           description: "Tu pedido ha sido procesado con éxito.",

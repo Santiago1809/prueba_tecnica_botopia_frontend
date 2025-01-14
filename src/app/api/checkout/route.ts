@@ -7,12 +7,12 @@ const stripe = new Stripe(
 );
 
 export async function POST(request: NextRequest) {
-  const { cart, sendingData } = await request.json();
+  const { cart, sendingData, costOfSending } = await request.json();
 
   if (sendingData.paymentMethod === "card") {
     const session = await stripe.checkout.sessions.create({
-      line_items: cart.map((item: CartItem) => {
-        return {
+      line_items: [
+        ...cart.map((item: CartItem) => ({
           price_data: {
             currency: "cop",
             product_data: {
@@ -22,8 +22,18 @@ export async function POST(request: NextRequest) {
             unit_amount: item.price,
           },
           quantity: item.quantity,
-        };
-      }),
+        })),
+        {
+          price_data: {
+            currency: "cop",
+            product_data: {
+              name: "Costo de envío",
+            },
+            unit_amount: Number.parseInt(costOfSending) * 100, // Monto fijo de 10000 COP para el envío
+          },
+          quantity: 1,
+        }
+      ],
       mode: "payment",
       metadata: {
         sendingData: JSON.stringify(sendingData),

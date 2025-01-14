@@ -20,7 +20,7 @@ import { useCartStore } from "@/store/cartStore";
 export default function CartPage() {
   const {cart, updateQuantity, removeItem, totalPrice} = useCartStore()
 
-  const costOfSending = totalPrice > 150000 ? 0 : totalPrice*0.15
+  const costOfSending = totalPrice > 150000 ? 0 : totalPrice*0.35
 
   const handleUpdateQuantity = (id: string, newQuantity: number) => {
     if (newQuantity >= 1) {
