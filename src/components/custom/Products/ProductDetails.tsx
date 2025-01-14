@@ -110,43 +110,42 @@ export default function ProductDetails({ product }: Props) {
                   <p className="text-red-500">No disponible</p>
                 )}
               </div>
-              <div className="bg-gray-300 rounded-lg">
-                <p></p>
-              </div>
-              <div className="bg-gray-200 mb-8 text-gray-600 rounded-lg px-3 py-6 flex flex-col space-y-2">
-                Disponible para:
-                <div className="flex gap-x-6 bg-gray-400 p-2 rounded-lg text-white">
-                  <Store />
-                  Recoger en tienda
-                </div>
-                <div className="flex gap-x-6 bg-gray-400 p-2 rounded-lg text-white">
-                  <Truck />
-                  Entrega a domicilio
-                </div>
-              </div>
-              <div className="flex flex-col space-y-2">
-                <Button
-                  onClick={handleAddToCart}
-                  className="w-full bg-orange-500 hover:bg-orange-500/90 transition-colors duration-300"
-                >
-                  <ShoppingCart />
-                  Añadir al carrito
-                </Button>
-                <Button
-                  onClick={handleAddToCart}
-                  className="w-full bg-transparent hover:bg-blue-400 border hover:text-white border-blue-400 text-blue-400 transition-colors duration-300"
-                >
-                  <ShoppingBag />
-                  Comprar ahora
-                </Button>
-              </div>
+              {product.stock !== 0 && (
+                <>
+                  <div className="bg-gray-200 mb-8 text-gray-600 rounded-lg px-3 py-6 flex flex-col space-y-2">
+                    Disponible para:
+                    <div className="flex gap-x-6 bg-gray-400 p-2 rounded-lg text-white">
+                      <Store />
+                      Recoger en tienda
+                    </div>
+                    <div className="flex gap-x-6 bg-gray-400 p-2 rounded-lg text-white">
+                      <Truck />
+                      Entrega a domicilio
+                    </div>
+                  </div>
+                  <div className="flex flex-col space-y-2">
+                    <Button
+                      onClick={handleAddToCart}
+                      className="w-full bg-orange-500 hover:bg-orange-500/90 transition-colors duration-300"
+                    >
+                      <ShoppingCart />
+                      Añadir al carrito
+                    </Button>
+                    <Button
+                      onClick={handleAddToCart}
+                      className="w-full bg-transparent hover:bg-blue-400 border hover:text-white border-blue-400 text-blue-400 transition-colors duration-300"
+                    >
+                      <ShoppingBag />
+                      Comprar ahora
+                    </Button>
+                  </div>
+                </>
+              )}
             </div>
           </div>
         </CardContent>
       </Card>
-      <Markdown className="text-gray-600 my-6">
-        {product?.description}
-      </Markdown>
+      <Markdown className="text-gray-600 my-6">{product?.description}</Markdown>
     </>
   );
 }

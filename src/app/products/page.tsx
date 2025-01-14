@@ -12,7 +12,7 @@ import {
 } from "@/types/products";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
-import { getProducts } from "../../actions/products";
+import { getProducts } from "@/actions/products";
 import Loader from "@/components/Loader";
 
 export const experimental_ppr = true;
