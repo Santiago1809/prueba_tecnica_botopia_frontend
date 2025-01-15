@@ -37,6 +37,7 @@ export async function POST(request: NextRequest) {
       mode: "payment",
       metadata: {
         sendingData: JSON.stringify(sendingData),
+        cart: JSON.stringify(cart),
       },
       success_url: 'http://localhost:3000/success'
     });

@@ -30,6 +30,7 @@ export default function ProductDetails({ product }: Props) {
     // Aquí iría la lógica para añadir al carrito
     addItem({
       id: product.id as string,
+      documentId: product.documentId as string,
       name: product.name,
       price: product.price,
       imageUrl: product.images[0],

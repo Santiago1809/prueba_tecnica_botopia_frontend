@@ -26,12 +26,13 @@ export const insertView = async (id: string) => {
 export const getProducts = async (query = "") => {
   try {
     const response = await fetch(
-      `${BACKEND_HOST}/api/products?populate[Images][fields][0]=url&populate[Category][fields][0]=Name${query}`
+      `${BACKEND_HOST}/api/products?populate[Images][fields][0]=url&populate[Category][fields][0]=Name${query}&populate=Store`
     );
     if (!response.ok) throw new Error(`Error ${response.status}`);
     const { data } = await response.json();
     const fetchedProducts = data.map((item: ExternaProductData) => ({
-      id: item.documentId,
+      id: item.id,
+      documentId: item.documentId,
       name: item.Name,
       price: item.Price,
       category: {
@@ -57,7 +58,8 @@ export const fetchProduct = async (id: string) => {
     const info = data as ExternaProductData;
 
     const externalProduct: Product = {
-      id: info.documentId,
+      id: info.id,
+      documentId: info.documentId,
       name: info.Name,
       description: info.Description,
       price: info.Price,
@@ -81,7 +83,8 @@ export async function getMostViewedProducts() {
     const { data } = await response.json();
     const fetchedProducts: Product[] = data.map(
       (item: ExternalMostViewedProductData) => ({
-        id: item.attributes.documentId,
+        id: item.id,
+        documentId: item.attributes.documentId,
         name: item.attributes.Name,
         price: item.attributes.Price,
         images: item.attributes.Images.map(

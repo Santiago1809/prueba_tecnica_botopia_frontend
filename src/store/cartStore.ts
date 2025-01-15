@@ -4,6 +4,7 @@ import { persist } from "zustand/middleware";
 // Definimos los tipos
 interface CartItem {
   id: string;
+  documentId: string
   name: string;
   price: number;
   imageUrl: string;
