@@ -3,7 +3,7 @@ import { persist } from "zustand/middleware";
 
 // Definimos los tipos
 interface CartItem {
-  id: string;
+  id: number;
   documentId: string
   name: string;
   price: number;
@@ -16,8 +16,8 @@ interface CartStore {
   totalItems: number;
   totalPrice: number;
   addItem: (item: CartItem) => void;
-  removeItem: (id: string) => void;
-  updateQuantity: (id: string, quantity: number) => void;
+  removeItem: (id: number) => void;
+  updateQuantity: (id: number, quantity: number) => void;
   clearCart: () => void;
 }
 

@@ -3,6 +3,7 @@ import Stripe from "stripe";
 import { headers } from "next/headers";
 import { BACKEND_HOST } from "@/lib/constants";
 import { CartItem } from "@/types/cart";
+import Products from "@/components/custom/Products/Products";
 
 const stripe = new Stripe(
   "sk_test_51QfpIGLbFsg2Knh9YoEVfDRhDZjBKRRv8XTUmlXIsgHo2Ktayhyr3Pell72rR0g3ma6ZE3hkbDjjpVVUvJVEBSZ400gidTQWo0"
@@ -31,9 +32,20 @@ export async function POST(request: NextRequest) {
   switch (event.type) {
     case "checkout.session.completed":
       const session = event.data.object;
+      if (!session.metadata) {
+        return NextResponse.json({ error: "Missing metadata" }, { status: 400 });
+      }
       const sendingData = JSON.parse(session.metadata.sendingData);
       const cart = JSON.parse(session.metadata.cart);
-      
+      const response = await fetch(`${BACKEND_HOST}/api/report-new-sale`, {
+        method: "POST",
+        body: JSON.stringify({ sendingData, Products: cart }),
+        headers: {
+          "Content-Type": "application/json",
+        },
+      })
+      const {message} = await response.json();
+      console.log(message);
       break;
     default:
       console.log(`Unhandled event type ${event.type}`);

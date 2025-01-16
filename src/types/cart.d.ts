@@ -1,9 +1,10 @@
 export interface CartItem {
   id: string;
+  documentId: string
   name: string;
   price: number;
+  imageUrl: string;
   quantity: number;
-  imageUrl?: string;
 }
 export interface UseShoppingCart {
   cart: CartItem[];
@@ -13,4 +14,11 @@ export interface UseShoppingCart {
   clearCart: () => void;
   totalItems: number;
   totalPrice: number;
+}
+export interface MetadataCartItem {
+  id: number
+  documentId: string
+  quantity: number
+  imageUrl: string
+  store_id: number
 }

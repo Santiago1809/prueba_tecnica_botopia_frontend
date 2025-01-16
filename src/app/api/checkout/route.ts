@@ -1,4 +1,4 @@
-import { CartItem } from "@/types/cart";
+import { CartItem, MetadataCartItem } from "@/types/cart";
 import { NextRequest, NextResponse } from "next/server";
 import Stripe from "stripe";
 
@@ -32,14 +32,24 @@ export async function POST(request: NextRequest) {
             unit_amount: Number.parseInt(costOfSending) * 100, // Monto fijo de 10000 COP para el envío
           },
           quantity: 1,
-        }
+        },
       ],
       mode: "payment",
       metadata: {
         sendingData: JSON.stringify(sendingData),
-        cart: JSON.stringify(cart),
+        cart: JSON.stringify(
+          cart.map((item: MetadataCartItem) => {
+            return {
+              id: item.id,
+              documentId: item.documentId,
+              quantity: item.quantity,
+              imageUrl: item.imageUrl,
+              store_id: item.store_id,
+            };
+          })
+        ),
       },
-      success_url: 'http://localhost:3000/success'
+      success_url: "http://localhost:3000/success",
     });
     return NextResponse.json(session);
   }

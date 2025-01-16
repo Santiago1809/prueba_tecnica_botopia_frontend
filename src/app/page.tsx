@@ -1,18 +1,23 @@
 "use client";
 import { getMostViewedProducts } from "@/actions/products";
+import { getStores } from "@/actions/stores";
 import Container from "@/components/custom/Container";
 import Products from "@/components/custom/Products/Products";
 import Loader from "@/components/Loader";
 import { Button } from "@/components/ui/button";
+import { useStoresStore } from "@/store/stores";
 import { Product } from "@/types/products";
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 
 export default function Home() {
+  const { setStores } = useStoresStore();
   const [featuredProducts, setFeaturedProducts] = useState<Product[] | null>();
   useEffect(() => {
     (async () => {
+      const fetchedStores = await getStores();
+      setStores(fetchedStores);
       const products = getMostViewedProducts();
       setFeaturedProducts(await products);
     })();

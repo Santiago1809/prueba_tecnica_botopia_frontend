@@ -29,7 +29,7 @@ export default function ProductDetails({ product }: Props) {
   const handleAddToCart = () => {
     // Aquí iría la lógica para añadir al carrito
     addItem({
-      id: product.id as string,
+      id: product.id,
       documentId: product.documentId as string,
       name: product.name,
       price: product.price,

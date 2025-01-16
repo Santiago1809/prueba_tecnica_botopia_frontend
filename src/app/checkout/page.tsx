@@ -22,9 +22,8 @@ import { Separator } from "@/components/ui/separator";
 import { useToast } from "@/hooks/use-toast";
 import { CopFormatNumber } from "@/lib/utils";
 import { useCartStore } from "@/store/cartStore";
+import { useStoresStore } from "@/store/stores";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useRouter } from "next/navigation";
-import { title } from "process";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
@@ -85,10 +84,10 @@ const checkoutSchema = z.object({
 type CheckoutValues = z.infer<typeof checkoutSchema>;
 
 export default function CheckoutPage() {
+  const {stores} = useStoresStore()
   const { totalPrice, cart, clearCart } = useCartStore();
   const costOfSending = totalPrice > 150000 ? 0 : totalPrice * 0.35;
   const { toast } = useToast();
-  const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [selectedCountry, setSelectedCountry] = useState<CountryCode>("es");
 
@@ -115,6 +114,9 @@ export default function CheckoutPage() {
           return {
             ...item,
             price: item.price * 100,
+            store_id: stores.find((store)=> {
+              return store.Products.some((product)=> product.documentId === item.documentId)
+            })?.id
           };
         }),
         sendingData: data,
