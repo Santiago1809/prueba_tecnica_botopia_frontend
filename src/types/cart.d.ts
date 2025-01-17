@@ -17,8 +17,8 @@ export interface UseShoppingCart {
 }
 export interface MetadataCartItem {
   id: number
+  name: string
   documentId: string
   quantity: number
-  imageUrl: string
   store_id: number
 }

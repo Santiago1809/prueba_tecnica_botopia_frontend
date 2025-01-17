@@ -1,3 +1,4 @@
+"use server";
 import { CartItem, MetadataCartItem } from "@/types/cart";
 import { NextRequest, NextResponse } from "next/server";
 import Stripe from "stripe";
@@ -7,7 +8,7 @@ const stripe = new Stripe(
 );
 
 export async function POST(request: NextRequest) {
-  const { cart, sendingData, costOfSending } = await request.json();
+  const { cart, sendingData, costOfSending, totalPrice } = await request.json();
 
   if (sendingData.paymentMethod === "card") {
     const session = await stripe.checkout.sessions.create({
@@ -43,11 +44,11 @@ export async function POST(request: NextRequest) {
               id: item.id,
               documentId: item.documentId,
               quantity: item.quantity,
-              imageUrl: item.imageUrl,
               store_id: item.store_id,
             };
           })
         ),
+        totalPrice,
       },
       success_url: "http://localhost:3000/success",
     });

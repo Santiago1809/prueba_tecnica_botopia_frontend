@@ -16,7 +16,7 @@ export default function Header() {
   const pathname = usePathname();
   const isAdminRoute = pathname?.startsWith("/admin");
   const { totalItems } = useCartStore();
-  const { name, isLoggedIn } = useAuthStore();
+  const { userName, isLoggedIn } = useAuthStore();
   const [open, setOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -70,9 +70,9 @@ export default function Header() {
             </form>
           </div>
           <div className="hidden md:flex items-center space-x-4">
-            {name !== "" && (
+            {userName !== "" && (
               <span className="text-sm font-medium text-gray-600">
-                Hola, {name}
+                Hola, {userName}
               </span>
             )}
             {isLoggedIn ? (
@@ -131,9 +131,9 @@ export default function Header() {
               />
             </form>
             <div className="flex items-center justify-between">
-              {name !== "" && (
+              {userName !== "" && (
                 <span className="text-sm font-medium text-gray-600">
-                  Hola, {name}
+                  Hola, {userName}
                 </span>
               )}
               {isLoggedIn ? (

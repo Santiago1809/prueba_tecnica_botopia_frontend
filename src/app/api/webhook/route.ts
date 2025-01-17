@@ -1,9 +1,7 @@
+import { BACKEND_HOST } from "@/lib/constants";
+import { headers } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
 import Stripe from "stripe";
-import { headers } from "next/headers";
-import { BACKEND_HOST } from "@/lib/constants";
-import { CartItem } from "@/types/cart";
-import Products from "@/components/custom/Products/Products";
 
 const stripe = new Stripe(
   "sk_test_51QfpIGLbFsg2Knh9YoEVfDRhDZjBKRRv8XTUmlXIsgHo2Ktayhyr3Pell72rR0g3ma6ZE3hkbDjjpVVUvJVEBSZ400gidTQWo0"
@@ -37,15 +35,16 @@ export async function POST(request: NextRequest) {
       }
       const sendingData = JSON.parse(session.metadata.sendingData);
       const cart = JSON.parse(session.metadata.cart);
+      const totalPrice = session.metadata.totalPrice;
       const response = await fetch(`${BACKEND_HOST}/api/report-new-sale`, {
         method: "POST",
-        body: JSON.stringify({ sendingData, Products: cart }),
+        body: JSON.stringify({ sendingData, Products: cart, totalPrice }),
         headers: {
           "Content-Type": "application/json",
         },
       })
-      const {message} = await response.json();
-      console.log(message);
+      
+      console.log(await response.json());
       break;
     default:
       console.log(`Unhandled event type ${event.type}`);

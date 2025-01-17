@@ -8,8 +8,12 @@ interface AuthStore {
   setAuth: (value: boolean) => void;
   token: string; // Token de autenticación
   setToken: (value: string) => void;
-  name: string
+  name: string;
   setName: (value: string) => void;
+  email: string;
+  setEmail: (value: string) => void;
+  userName: string;
+  setUserName: (value: string) => void;
   logOut: () => void;
 }
 
@@ -24,8 +28,12 @@ export const useAuthStore = create<AuthStore>()(
       setToken: (value) => set({ token: value }),
       name: "",
       setName: (value) => set({ name: value }),
+      email: "",
+      setEmail: (value) => set({ email: value }),
+      userName: "",
+      setUserName: (value) => set({ userName: value }),
       logOut: () => {
-        set({ isLoggedIn: false, auth: false, token: "", name: "" });
+        set({ isLoggedIn: false, auth: false, token: "", name: "", email: "", userName: "" });
       },
     }),
     {

@@ -26,7 +26,7 @@ export const insertView = async (id: string) => {
 export const getProducts = async (query = "") => {
   try {
     const response = await fetch(
-      `${BACKEND_HOST}/api/products?populate[Images][fields][0]=url&populate[Category][fields][0]=Name${query}&populate=Store`
+      `${BACKEND_HOST}/api/products?populate[Images][fields][0]=url&populate[Category][fields][0]=Name${query}`
     );
     if (!response.ok) throw new Error(`Error ${response.status}`);
     const { data } = await response.json();
@@ -41,6 +41,7 @@ export const getProducts = async (query = "") => {
         Name: item.Category.Name,
       },
       images: item.Images.map((image) => `${BACKEND_HOST}${image.url}`),
+      stock: item.Stock,
     }));
     return fetchedProducts;
   } catch (error) {
@@ -91,7 +92,9 @@ export async function getMostViewedProducts() {
           (image) => `${BACKEND_HOST}${image.url}`
         ),
         category: item.attributes.Category,
-      })
+        stock: item.attributes.Stock
+      }),
+    
     );
 
     return fetchedProducts;

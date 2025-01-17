@@ -121,6 +121,7 @@ export default function CheckoutPage() {
         }),
         sendingData: data,
         costOfSending,
+        totalPrice: totalPrice + costOfSending,
       }),
       headers: {
         "Content-Type": "application/json",
