@@ -22,13 +22,15 @@ export default function ProfilePage() {
   const [orders, setOrders] = useState<Order[]>([]);
 
   useEffect(() => {
-    if (!isLoggedIn) {
-      window.location.href = "/login";
-    }
-    (async () => {
-      setOrders(await getOrdersByUser(userName, token));
-    })();
-    setIsLoading(false);
+    setTimeout(() => {
+      if (isLoggedIn===false) {
+        window.location.href = "/login";
+      }
+      (async () => {
+        setOrders(await getOrdersByUser(userName, token));
+      })();
+      setIsLoading(false);
+    }, 1500);
   }, []);
 
   if (isLoading) {

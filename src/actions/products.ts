@@ -23,7 +23,7 @@ export const insertView = async (id: string) => {
   });
 };
 
-export const getProducts = async (query = "") => {
+export const getProducts = async (query = ""): Promise<Product[]> => {
   try {
     const response = await fetch(
       `${BACKEND_HOST}/api/products?populate[Images][fields][0]=url&populate[Category][fields][0]=Name${query}`

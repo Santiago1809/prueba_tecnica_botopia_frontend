@@ -22,7 +22,7 @@ export default function CartPage() {
 
   const costOfSending = totalPrice > 150000 ? 0 : totalPrice*0.35
 
-  const handleUpdateQuantity = (id: string, newQuantity: number) => {
+  const handleUpdateQuantity = (id: number, newQuantity: number) => {
     if (newQuantity >= 1) {
       updateQuantity(id, newQuantity);
     }

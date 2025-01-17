@@ -6,8 +6,15 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useAuthStore } from "@/store/authStore";
 import Link from "next/link";
-import { useActionState } from "react";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { useActionState, useEffect } from "react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import {
   Form,
   FormControl,
@@ -29,17 +36,30 @@ const loginSchema = z.object({
 type LoginValues = z.infer<typeof loginSchema>;
 
 export default function LoginPage() {
-  const { setIsLoggedIn, setToken, setAuth, setName } = useAuthStore();
+  const { setIsLoggedIn, setToken, setAuth, setName, isLoggedIn, setEmail, setUserName } =
+    useAuthStore();
+
+  useEffect(() => {
+    if (isLoggedIn) {
+      window.history.back();
+    }
+  }, []);
+
   const [error, formAction, isPending] = useActionState(
     async (prevState: unknown, queryData: FormData) => {
       const res = await login(prevState, queryData);
       if (!res) {
         return "Error al iniciar sesión. Por favor, verifica tus credenciales.";
       }
+      console.log(res);
+
       setIsLoggedIn(true);
-      setToken(res.jwt);
-      setAuth(res.user.user_role === "ADMIN");
-      setName(res.user.username);
+      setToken(res?.jwt);
+      setAuth(res?.user?.user_role === "ADMIN");
+      setName(res?.user?.display_name);
+      setEmail(res?.user?.email);
+      setUserName(res?.user?.username);
+      window.history.back();
       return null;
     },
     null
@@ -53,12 +73,6 @@ export default function LoginPage() {
     },
   });
 
-  const onSubmit = (data: LoginValues) => {
-    const formData = new FormData();
-    Object.entries(data).forEach(([key, value]) => formData.append(key, value));
-    formAction(formData);
-  };
-
   return (
     <div className="container mx-auto px-4 py-8">
       <Card className="max-w-md mx-auto">
@@ -70,7 +84,7 @@ export default function LoginPage() {
         </CardHeader>
         <CardContent>
           <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6" autoComplete="off">
+            <form action={formAction} className="space-y-6" autoComplete="off">
               <FormField
                 control={form.control}
                 name="identifier"
@@ -78,7 +92,11 @@ export default function LoginPage() {
                   <FormItem>
                     <FormLabel>Correo electrónico</FormLabel>
                     <FormControl>
-                      <Input {...field} type="email" placeholder="tu@ejemplo.com" />
+                      <Input
+                        {...field}
+                        type="email"
+                        placeholder="tu@ejemplo.com"
+                      />
                     </FormControl>
                     <FormDescription>
                       Ingresa el correo electrónico asociado a tu cuenta.
@@ -122,4 +140,3 @@ export default function LoginPage() {
     </div>
   );
 }
-

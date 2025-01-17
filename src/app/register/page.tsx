@@ -24,7 +24,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useAuthStore } from "@/store/authStore";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Link from "next/link";
-import { useActionState } from "react";
+import { useActionState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
 
@@ -55,7 +55,13 @@ type RegisterValues = z.infer<typeof registerSchema>;
 
 export default function RegisterPage() {
   const { toast } = useToast();
-  const { setName, setAuth, setIsLoggedIn, setToken } = useAuthStore();
+  const { setName, setAuth, setIsLoggedIn, setToken, isLoggedIn } =
+    useAuthStore();
+  useEffect(() => {
+    if (isLoggedIn) {
+      window.location.href = "/";
+    }
+  });
 
   const [error, registerAction, isPending] = useActionState(
     async (prevState: string | null, formData: FormData) => {
