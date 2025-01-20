@@ -5,22 +5,20 @@ import {
   ExternaProductData,
   Product,
 } from "@/types/products";
-import { getOrCreateSessionId } from "@/utils/session";
 
-export const insertView = async (id: string) => {
-  const sessionId = getOrCreateSessionId();
+export const insertView = async (id: string, user_id: number | string) => {
+  const data = typeof user_id === 'number' 
+    ? { data: { user: user_id, product: id } }
+    : { data: { product: id } };
+
   await fetch(`${BACKEND_HOST}/api/views`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
     },
-    body: JSON.stringify({
-      data: {
-        SessionId: await sessionId,
-        product: id,
-      },
-    }),
-  });
+    body: JSON.stringify(data),
+  }).then((res) => res.json())
+  .catch((error) => console.error("Error inserting view:", error));
 };
 
 export const getProducts = async (query = ""): Promise<Product[]> => {
