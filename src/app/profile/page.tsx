@@ -13,10 +13,12 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useAuthStore } from "@/store/authStore";
 import { Order } from "@/types/order";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
 
 export default function ProfilePage() {
+  const router = useRouter()
   const { email, name, userName, token, isLoggedIn } = useAuthStore();
   const [isLoading, setIsLoading] = useState(true);
   const [orders, setOrders] = useState<Order[]>([]);
@@ -24,7 +26,7 @@ export default function ProfilePage() {
   useEffect(() => {
     setTimeout(() => {
       if (isLoggedIn===false) {
-        window.location.href = "/login";
+        router.push("/login");
       }
       (async () => {
         setOrders(await getOrdersByUser(userName, token));

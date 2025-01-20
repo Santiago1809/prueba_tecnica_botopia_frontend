@@ -24,6 +24,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useAuthStore } from "@/store/authStore";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useActionState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
@@ -54,12 +55,13 @@ const registerSchema = z
 type RegisterValues = z.infer<typeof registerSchema>;
 
 export default function RegisterPage() {
+  const router = useRouter();
   const { toast } = useToast();
   const { setName, setAuth, setIsLoggedIn, setToken, isLoggedIn } =
     useAuthStore();
   useEffect(() => {
     if (isLoggedIn) {
-      window.location.href = "/";
+      router.push("/");
     }
   });
 
@@ -85,7 +87,7 @@ export default function RegisterPage() {
         description: "Tu cuenta ha sido creada!",
       });
 
-      window.location.href = "/";
+      router.push("/");
       return null;
     },
     null

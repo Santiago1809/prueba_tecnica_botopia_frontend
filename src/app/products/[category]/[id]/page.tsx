@@ -5,6 +5,7 @@ import Container from "@/components/custom/Container";
 import ProductDetails from "@/components/custom/Products/ProductDetails";
 import Loader from "@/components/Loader";
 import { Product } from "@/types/products";
+import { useRouter } from "next/navigation";
 import { use, useEffect, useState } from "react";
 
 export default function ProductPage({
@@ -12,6 +13,7 @@ export default function ProductPage({
 }: {
   params: Promise<{ id: string }>;
 }) {
+  const router = useRouter();
   const resolvedParams = use(params);
   const [product, setProduct] = useState<Product | null>();
   const id = resolvedParams.id;
@@ -21,7 +23,7 @@ export default function ProductPage({
       const fetchedProduct = await fetchProduct(id);
       if (fetchedProduct) setProduct(fetchedProduct);
       else {
-        window.location.href = "/404";
+        router.push("/404");
         return null;
       }
     };

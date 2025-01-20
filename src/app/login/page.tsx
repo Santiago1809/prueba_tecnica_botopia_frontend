@@ -27,6 +27,7 @@ import {
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
+import { useRouter } from "next/navigation";
 
 const loginSchema = z.object({
   identifier: z.string().email("Ingresa un correo electrónico válido"),
@@ -36,12 +37,13 @@ const loginSchema = z.object({
 type LoginValues = z.infer<typeof loginSchema>;
 
 export default function LoginPage() {
+  const router = useRouter()
   const { setIsLoggedIn, setToken, setAuth, setName, isLoggedIn, setEmail, setUserName } =
     useAuthStore();
 
   useEffect(() => {
     if (isLoggedIn) {
-      window.history.back();
+      router.back()
     }
   }, []);
 
@@ -59,7 +61,7 @@ export default function LoginPage() {
       setName(res?.user?.display_name);
       setEmail(res?.user?.email);
       setUserName(res?.user?.username);
-      window.history.back();
+      router.back();
       return null;
     },
     null

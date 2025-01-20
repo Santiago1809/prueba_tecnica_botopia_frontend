@@ -1,5 +1,7 @@
 "use client";
 
+import { createCheckoutSession, createPayPalOrder } from "@/actions/orders";
+import { OrderSummary } from "@/components/custom/Checkout/OrderSumary";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
@@ -20,11 +22,13 @@ import {
 } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
 import { useToast } from "@/hooks/use-toast";
-import { CopFormatNumber } from "@/lib/utils";
+import { useAuthStore } from "@/store/authStore";
 import { useCartStore } from "@/store/cartStore";
 import { useStoresStore } from "@/store/stores";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useState } from "react";
+import { PayPalButtons, PayPalScriptProvider } from "@paypal/react-paypal-js";
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
 
@@ -84,12 +88,20 @@ const checkoutSchema = z.object({
 type CheckoutValues = z.infer<typeof checkoutSchema>;
 
 export default function CheckoutPage() {
-  const {stores} = useStoresStore()
-  const { totalPrice, cart, clearCart } = useCartStore();
+  const router = useRouter();
+  const { stores } = useStoresStore();
+  const { totalPrice, cart, clearCart, totalItems } = useCartStore();
+  const { isLoggedIn } = useAuthStore();
   const costOfSending = totalPrice > 150000 ? 0 : totalPrice * 0.35;
   const { toast } = useToast();
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [selectedCountry, setSelectedCountry] = useState<CountryCode>("es");
+  const [selectedCountry, setSelectedCountry] = useState<CountryCode>("co");
+
+  useEffect(() => {
+    if (!isLoggedIn) {
+      router.push("/login");
+    }
+  }, [isLoggedIn, router]);
 
   const form = useForm<CheckoutValues>({
     resolver: zodResolver(checkoutSchema),
@@ -98,7 +110,7 @@ export default function CheckoutPage() {
       email: "",
       address: "",
       city: "",
-      country: "es",
+      country: "co",
       zipCode: "",
       paymentMethod: "card",
     },
@@ -106,41 +118,43 @@ export default function CheckoutPage() {
 
   const onSubmit = async (data: CheckoutValues) => {
     setIsSubmitting(true);
-    // Simulate API call to create Stripe session
-    await fetch("/api/checkout", {
-      method: "POST",
-      body: JSON.stringify({
-        cart: cart.map((item) => {
-          return {
-            ...item,
-            price: item.price * 100,
-            store_id: stores.find((store)=> {
-              return store.Products.some((product)=> product.documentId === item.documentId)
-            })?.id
-          };
-        }),
-        sendingData: data,
-        costOfSending,
-        totalPrice: totalPrice + costOfSending,
-      }),
-      headers: {
-        "Content-Type": "application/json",
-      },
-    })
-      .then((res) => res.json())
-      .then((data) => {
-        clearCart();
-        window.location = data.url;
-        toast({
-          title: "Pago exitoso",
-          description: "Tu pedido ha sido procesado con éxito.",
-          variant: "default",
-        });
+    const formData = new FormData();
+    formData.append(
+      "cart",
+      JSON.stringify(
+        cart.map((item) => ({
+          ...item,
+          price: item.price * 100,
+          store_id: stores.find((store) =>
+            store.Products.some(
+              (product) => product.documentId === item.documentId
+            )
+          )?.id,
+        }))
+      )
+    );
+    formData.append("sendingData", JSON.stringify(data));
+    formData.append("costOfSending", costOfSending.toString());
+    formData.append("totalPrice", (totalPrice + costOfSending).toString());
+
+    const result = await createCheckoutSession(formData);
+
+    if (result && "error" in result) {
+      toast({
+        title: "Error",
+        description: result.error,
+        variant: "destructive",
       });
+    } else {
+      clearCart();
+      toast({
+        title: "Pago exitoso",
+        description: "Tu pedido ha sido procesado con éxito.",
+        variant: "default",
+      });
+    }
     setIsSubmitting(false);
   };
-
-  const watchPaymentMethod = form.watch("paymentMethod");
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -297,39 +311,92 @@ export default function CheckoutPage() {
                     </FormItem>
                   )}
                 />
-                <Button
-                  type="submit"
-                  className="w-full"
-                  disabled={isSubmitting}
-                >
-                  {isSubmitting ? "Procesando..." : "Proceder al pago"}
-                </Button>
+
+                {form.watch("paymentMethod") === "paypal" ? (
+                  <PayPalScriptProvider
+                    options={{
+                      clientId: process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID!,
+                    }}
+                  >
+                    <PayPalButtons
+                      style={{
+                        height: 35,
+                        layout: "horizontal",
+                        label: "pay",
+                        color: "blue",
+                      }}
+                      createOrder={async () => {
+                        const formData = new FormData();
+                        formData.append(
+                          "cart",
+                          JSON.stringify(
+                            cart.map((item) => ({
+                              ...item,
+                              price: item.price * 100,
+                              store_id: stores.find((store) =>
+                                store.Products.some(
+                                  (product) =>
+                                    product.documentId === item.documentId
+                                )
+                              )?.id,
+                            }))
+                          )
+                        );
+                        formData.append(
+                          "sendingData",
+                          JSON.stringify(form.getValues())
+                        );
+                        formData.append(
+                          "costOfSending",
+                          costOfSending.toString()
+                        );
+                        formData.append(
+                          "totalPrice",
+                          (totalPrice + costOfSending).toString()
+                        );
+                        formData.append("totalItems", totalItems.toString())
+
+                        const order = await createPayPalOrder(formData);
+                        console.log(order);
+                        return order.id;
+                      }}
+                      onApprove={async (data, actions) => {
+                        try {
+                          await actions.order?.capture();
+                          clearCart();
+                          router.push("/success");
+                          toast({
+                            title: "Pago exitoso",
+                            description:
+                              "Tu pedido ha sido procesado con éxito.",
+                            variant: "default",
+                          });
+                        } catch (error) {
+                          toast({
+                            title: "Error",
+                            description:
+                              (error as Error).message ||
+                              "Ocurrió un problema al capturar el pago",
+                            variant: "destructive",
+                          });
+                        }
+                      }}
+                    />
+                  </PayPalScriptProvider>
+                ) : (
+                  <Button
+                    type="submit"
+                    className="w-full"
+                    disabled={isSubmitting}
+                  >
+                    {isSubmitting ? "Procesando..." : "Proceder al pago"}
+                  </Button>
+                )}
               </form>
             </Form>
           </CardContent>
         </Card>
-        <Card>
-          <CardHeader>
-            <CardTitle>Resumen del pedido</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              <div className="flex justify-between">
-                <span>Subtotal</span>
-                <span>{CopFormatNumber(totalPrice)}</span>
-              </div>
-              <div className="flex justify-between">
-                <span>Envío</span>
-                <span>{CopFormatNumber(costOfSending)}</span>
-              </div>
-              <Separator />
-              <div className="flex justify-between font-bold">
-                <span>Total</span>
-                <span>{CopFormatNumber(totalPrice + costOfSending)}</span>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+        <OrderSummary costOfSending={costOfSending} totalPrice={totalPrice} />
       </div>
     </div>
   );
