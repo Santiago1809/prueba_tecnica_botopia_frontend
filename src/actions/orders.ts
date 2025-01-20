@@ -1,7 +1,6 @@
 "use server";
-import { BACKEND_HOST } from "@/lib/constants";
+import { BACKEND_HOST, HOST_LOCAL } from "@/lib/constants";
 import { revalidatePath } from "next/cache";
-import { redirect } from "next/navigation";
 
 export async function getOrdersByUser(username: string, token: string) {
   const response = await fetch(`${BACKEND_HOST}/api/get-sales/${username}`, {
@@ -20,7 +19,7 @@ export async function createCheckoutSession(formData: FormData) {
   const totalPrice = parseFloat(formData.get("totalPrice") as string);
 
   try {
-    const response = await fetch(`/api/checkout`, {
+    const response = await fetch(`${HOST_LOCAL}/api/checkout`, {
       method: "POST",
       body: JSON.stringify({
         cart,
@@ -40,7 +39,7 @@ export async function createCheckoutSession(formData: FormData) {
     }
 
     revalidatePath("/checkout");
-    redirect(data.url);
+    return data
   } catch (error) {
     return { error: (error as Error).message };
   }
@@ -54,14 +53,14 @@ export async function createPayPalOrder(formData: FormData) {
   const totalItems = parseInt(formData.get("totalItems") as string);
 
   try {
-    const response = await fetch(`http://localhost:3000/api/checkout`, {
+    const response = await fetch(`${HOST_LOCAL}/api/checkout`, {
       method: "POST",
       body: JSON.stringify({
         cart,
         sendingData,
         costOfSending,
         totalPrice,
-        totalItems
+        totalItems,
       }),
       headers: {
         "Content-Type": "application/json",

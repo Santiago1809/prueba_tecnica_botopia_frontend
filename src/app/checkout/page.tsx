@@ -146,6 +146,7 @@ export default function CheckoutPage() {
         variant: "destructive",
       });
     } else {
+      window.location = result.url;
       clearCart();
       toast({
         title: "Pago exitoso",
@@ -354,10 +355,9 @@ export default function CheckoutPage() {
                           "totalPrice",
                           (totalPrice + costOfSending).toString()
                         );
-                        formData.append("totalItems", totalItems.toString())
+                        formData.append("totalItems", totalItems.toString());
 
                         const order = await createPayPalOrder(formData);
-                        console.log(order);
                         return order.id;
                       }}
                       onApprove={async (data, actions) => {

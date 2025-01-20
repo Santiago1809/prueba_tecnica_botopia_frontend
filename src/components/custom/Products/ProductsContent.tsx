@@ -12,7 +12,7 @@ export default function ProductsContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [filteredProducts, setFilteredProducts] = useState<Product[] | null>();
-  const [priceRange, setPriceRange] = useState([0, 6000000]);
+  const [priceRange, setPriceRange] = useState([0, 60000000]);
   const [category, setCategory] = useState("all");
   const [searchTerm, setSearchTerm] = useState("");
   const [categories, setCategories] = useState<Category[]>([]);
@@ -21,7 +21,7 @@ export default function ProductsContent() {
     const categoryParam = searchParams.get("category") || "all";
     const searchParam = searchParams.get("search") || "";
     const minPrice = parseInt(searchParams.get("minPrice") || "0", 10);
-    const maxPrice = parseInt(searchParams.get("maxPrice") || "6000000", 10);
+    const maxPrice = parseInt(searchParams.get("maxPrice") || "60000000", 10);
 
     setCategory(categoryParam);
     setSearchTerm(searchParam);
@@ -54,7 +54,7 @@ export default function ProductsContent() {
       const category = searchParams.get("category") || "all";
       const search = searchParams.get("search") || "";
       const minPrice = parseInt(searchParams.get("minPrice") || "0", 10);
-      const maxPrice = parseInt(searchParams.get("maxPrice") || "6000000", 10);
+      const maxPrice = parseInt(searchParams.get("maxPrice") || "60000000", 10);
 
       const filters = [];
 

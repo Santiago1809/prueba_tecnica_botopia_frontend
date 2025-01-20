@@ -22,7 +22,6 @@ let client = new paypal.core.PayPalHttpClient(environment);
 export async function POST(request) {
   const { cart, sendingData, costOfSending, totalPrice, totalItems } =
     await request.json();
-  console.log({ totalItems });
 
   if (sendingData.paymentMethod === "card") {
     return await strapiPayment();
@@ -73,6 +72,7 @@ export async function POST(request) {
       },
       success_url: "http://localhost:3000/success",
     });
+    
     return NextResponse.json(session);
   }
 
@@ -141,7 +141,6 @@ export async function POST(request) {
         }
       );
 
-      console.log(await reportResponse.json());
       return NextResponse.json({
         id: response.result.id,
       });

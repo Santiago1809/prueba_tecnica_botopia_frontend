@@ -35,7 +35,6 @@ export default function CardProduct({ product }: Props) {
       });
       return;
     }
-    console.log(product);
 
     addItem({
       id: product.id,

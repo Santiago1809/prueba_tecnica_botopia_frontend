@@ -9,6 +9,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Slider } from "@/components/ui/slider";
+import { CopFormatNumber } from "@/lib/utils";
 import { Category } from "@/types/products";
 
 interface ProductFiltersProps {
@@ -65,14 +66,14 @@ export default function ProductFilters({
           <Label>Rango de precio</Label>
           <Slider
             min={0}
-            max={6000000}
-            step={10}
+            max={60000000}
+            step={100000}
             value={priceRange}
             onValueChange={setPriceRange}
           />
           <div className="flex justify-between mt-2">
-            <span>${priceRange[0]}</span>
-            <span>${priceRange[1]}</span>
+            <span>{CopFormatNumber(priceRange[0])}</span>
+            <span>{CopFormatNumber(priceRange[1])}</span>
           </div>
         </div>
         <Button onClick={onFilter}>Aplicar filtros</Button>

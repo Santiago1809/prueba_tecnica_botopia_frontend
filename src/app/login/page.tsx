@@ -62,7 +62,6 @@ export default function LoginPage() {
       if (!res) {
         return "Error al iniciar sesión. Por favor, verifica tus credenciales.";
       }
-      console.log(res);
 
       setIsLoggedIn(true);
       setToken(res?.jwt);

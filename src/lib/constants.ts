@@ -5,5 +5,6 @@ export const {
   NEXT_PUBLIC_PRUEBA,
   STRIPE_KEY,
   PAYPAL_CLIENT_ID,
-  PAYPAL_SECRET
+  PAYPAL_SECRET,
+  HOST_LOCAL = "http://localhost:3000",
 } = process.env;
