@@ -15,7 +15,7 @@ import Link from "next/link";
 import { useState, useActionState } from "react";
 
 export default function Login() {
-  const { setIsLoggedIn, setToken, setAuth, setName, setEmail, setUserName } = useAuthStore();
+  const { setIsLoggedIn, setToken, setAuth, setName, setEmail, setUserName, setId } = useAuthStore();
   const [isOpen, setIsOpen] = useState(false);
   const [_state, formAction, isPending] = useActionState(
     async (prevState: unknown, queryData: FormData) => {
@@ -29,6 +29,7 @@ export default function Login() {
         setName(res?.user?.display_name);
         setEmail(res?.user?.email);
         setUserName(res?.user?.username);
+        setId(res?.user?.id);
         setIsOpen(false);
       }
     },

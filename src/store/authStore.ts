@@ -1,3 +1,4 @@
+import { number } from "zod";
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
@@ -14,6 +15,8 @@ interface AuthStore {
   setEmail: (value: string) => void;
   userName: string;
   setUserName: (value: string) => void;
+  user_id: number;
+  setId: (value: number) => void;
   logOut: () => void;
 }
 
@@ -32,8 +35,17 @@ export const useAuthStore = create<AuthStore>()(
       setEmail: (value) => set({ email: value }),
       userName: "",
       setUserName: (value) => set({ userName: value }),
+      user_id: 0,
+      setId: (value: number) => set({ user_id: value }),
       logOut: () => {
-        set({ isLoggedIn: false, auth: false, token: "", name: "", email: "", userName: "" });
+        set({
+          isLoggedIn: false,
+          auth: false,
+          token: "",
+          name: "",
+          email: "",
+          userName: "",
+        });
       },
     }),
     {
