@@ -72,19 +72,17 @@ export async function POST(request) {
       },
       success_url: "http://localhost:3000/success",
     });
-    
+
     return NextResponse.json(session);
   }
 
   async function paypalPayment() {
-    
     // Conversión de valores a USD
     const itemsTotalUSD = cart.reduce(
-      (acc, item) => acc + ((item.price / 100) / EXCHANGE_RATE) * item.quantity,
+      (acc, item) => acc + (item.price / 100 / EXCHANGE_RATE) * item.quantity,
       0
     );
-    
-    
+
     const costOfSendingUSD = costOfSending / EXCHANGE_RATE;
 
     let request = new paypal.orders.OrdersCreateRequest();
@@ -95,29 +93,17 @@ export async function POST(request) {
           amount: {
             currency_code: "USD",
             value: (itemsTotalUSD + costOfSendingUSD).toFixed(2),
-            breakdown: {
-              item_total: {
-                currency_code: "USD",
-                value: (itemsTotalUSD).toFixed(2),
-              },
-              shipping: {
-                currency_code: "USD",
-                value: costOfSendingUSD.toFixed(2),
-              },
-            },
           },
-          items: cart.map((item) => {
-            return {
-              name: item.name,
-              unit_amount: {
-                currency_code: "USD",
-                value: (item.price / EXCHANGE_RATE).toFixed(2),
-              },
-              quantity: item.quantity.toString(),
-            };
-          }),
         },
       ],
+      application_context: {
+        return_url: "http://localhost:3000/success",
+        cancel_url: "http://localhost:3000/cancel",
+        user_action: "PAY_NOW",
+        payment_method: {
+          payee_preferred: "IMMEDIATE_PAYMENT_REQUIRED",
+        },
+      },
     });
 
     try {
