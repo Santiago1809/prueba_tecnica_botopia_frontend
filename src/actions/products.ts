@@ -7,9 +7,10 @@ import {
 } from "@/types/products";
 
 export const insertView = async (id: string, user_id: number | string) => {
-  const data = typeof user_id === 'number' 
-    ? { data: { user: user_id, product: id } }
-    : { data: { product: id } };
+  const data =
+    typeof user_id === "number"
+      ? { data: { user: user_id, product: id } }
+      : { data: { product: id } };
 
   await fetch(`${BACKEND_HOST}/api/views`, {
     method: "POST",
@@ -17,8 +18,9 @@ export const insertView = async (id: string, user_id: number | string) => {
       "Content-Type": "application/json",
     },
     body: JSON.stringify(data),
-  }).then((res) => res.json())
-  .catch((error) => console.error("Error inserting view:", error));
+  })
+    .then((res) => res.json())
+    .catch((error) => console.error("Error inserting view:", error));
 };
 
 export const getProducts = async (query = ""): Promise<Product[]> => {
@@ -90,14 +92,52 @@ export async function getMostViewedProducts() {
           (image) => `${BACKEND_HOST}${image.url}`
         ),
         category: item.attributes.Category,
-        stock: item.attributes.Stock
-      }),
-    
+        stock: item.attributes.Stock,
+      })
     );
 
     return fetchedProducts;
   } catch (error) {
     console.error("Error fetching most viewed products:", error);
     return null;
+  }
+}
+
+export async function getRecommendedProducts(token: string) {
+  if (token === "") return await getPublicProducts();
+  return await getLoggedProducts(token);
+}
+
+async function getLoggedProducts(token: string) {
+  try {
+    const response = await fetch(`${BACKEND_HOST}/api/recommendations`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    if (!response.ok) throw new Error(`Error ${response.status}`);
+    const products = []
+    const { categoryBased, popular } = await response.json();
+    products.push(...categoryBased, ...popular);
+    products.map((prod: Product) => {
+      prod.images = prod.images.map((image) => `${BACKEND_HOST}${image}`);
+    })
+    return products;
+  } catch {
+    return []
+  }
+}
+
+async function getPublicProducts() {
+  try {
+    const response = await fetch(`${BACKEND_HOST}/api/public/recommendations`);
+  if (!response.ok) throw new Error(`Error ${response.status}`);
+  const products = [];
+  const { random, popular } = await response.json();
+  products.push(...random, ...popular);
+  products.map((prod: Product) => {
+    prod.images = prod.images.map((image) => `${BACKEND_HOST}${image}`);
+  })
+  return products;
+  } catch {
+    return []
   }
 }

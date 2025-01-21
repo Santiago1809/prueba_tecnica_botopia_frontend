@@ -24,7 +24,6 @@ import { Separator } from "@/components/ui/separator";
 import { useToast } from "@/hooks/use-toast";
 import { useAuthStore } from "@/store/authStore";
 import { useCartStore } from "@/store/cartStore";
-import { useStoresStore } from "@/store/stores";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { PayPalButtons, PayPalScriptProvider } from "@paypal/react-paypal-js";
 import { useRouter } from "next/navigation";
@@ -89,10 +88,9 @@ type CheckoutValues = z.infer<typeof checkoutSchema>;
 
 export default function CheckoutPage() {
   const router = useRouter();
-  const { stores } = useStoresStore();
   const { totalPrice, cart, clearCart, totalItems } = useCartStore();
   const { isLoggedIn } = useAuthStore();
-  const costOfSending = totalPrice > 150000 ? 0 : totalPrice * 0.35;
+  const costOfSending = totalPrice > 50000 ? 0 : totalPrice * 0.35;
   const { toast } = useToast();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [selectedCountry, setSelectedCountry] = useState<CountryCode>("co");
@@ -125,11 +123,6 @@ export default function CheckoutPage() {
         cart.map((item) => ({
           ...item,
           price: item.price * 100,
-          store_id: stores.find((store) =>
-            store.Products.some(
-              (product) => product.documentId === item.documentId
-            )
-          )?.id,
         }))
       )
     );
@@ -334,12 +327,6 @@ export default function CheckoutPage() {
                             cart.map((item) => ({
                               ...item,
                               price: item.price * 100,
-                              store_id: stores.find((store) =>
-                                store.Products.some(
-                                  (product) =>
-                                    product.documentId === item.documentId
-                                )
-                              )?.id,
                             }))
                           )
                         );

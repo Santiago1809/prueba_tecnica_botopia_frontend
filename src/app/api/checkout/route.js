@@ -77,11 +77,14 @@ export async function POST(request) {
   }
 
   async function paypalPayment() {
+    
     // Conversión de valores a USD
     const itemsTotalUSD = cart.reduce(
-      (acc, item) => acc + (item.price / EXCHANGE_RATE) * item.quantity,
+      (acc, item) => acc + ((item.price / 100) / EXCHANGE_RATE) * item.quantity,
       0
     );
+    
+    
     const costOfSendingUSD = costOfSending / EXCHANGE_RATE;
 
     let request = new paypal.orders.OrdersCreateRequest();
@@ -95,7 +98,7 @@ export async function POST(request) {
             breakdown: {
               item_total: {
                 currency_code: "USD",
-                value: itemsTotalUSD.toFixed(2),
+                value: (itemsTotalUSD).toFixed(2),
               },
               shipping: {
                 currency_code: "USD",

@@ -132,13 +132,6 @@ export default function ProductDetails({ product }: Props) {
                       <ShoppingCart />
                       Añadir al carrito
                     </Button>
-                    <Button
-                      onClick={handleAddToCart}
-                      className="w-full bg-transparent hover:bg-blue-400 border hover:text-white border-blue-400 text-blue-400 transition-colors duration-300"
-                    >
-                      <ShoppingBag />
-                      Comprar ahora
-                    </Button>
                   </div>
                 </>
               )}
