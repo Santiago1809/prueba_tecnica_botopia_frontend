@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useAuthStore } from "@/store/authStore";
-import { Search, ShoppingCart, Menu, X } from "lucide-react";
+import { Search, ShoppingCart, Menu, X, Store } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import Login from "./user/Login";
@@ -16,7 +16,7 @@ export default function Header() {
   const pathname = usePathname();
   const isAdminRoute = pathname?.startsWith("/admin");
   const { totalItems } = useCartStore();
-  const { userName, isLoggedIn } = useAuthStore();
+  const { userName, isLoggedIn, auth } = useAuthStore();
   const [open, setOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -99,6 +99,18 @@ export default function Header() {
                 )}
               </Button>
             </Link>
+            {auth && (
+              <Link href="/admin">
+                <Button
+                  variant="outline"
+                  size="icon"
+                  className="hover:bg-primary/10 transition-colors relative"
+                >
+                  <Store className="size-5" />
+                  <span className="sr-only">Admin</span>
+                </Button>
+              </Link>
+            )}
           </div>
           <div className="md:hidden">
             <Button
@@ -153,15 +165,25 @@ export default function Header() {
                 >
                   <ShoppingCart className="size-5" />
                   <span className="sr-only">Carrito</span>
-                  {
-                    totalItems != 0 && (
-                      <span className="absolute -top-2 -right-2 bg-primary text-white text-xs font-bold rounded-full size-5 flex items-center justify-center">
-                        {totalItems}
-                      </span>
-                    )
-                  }
+                  {totalItems != 0 && (
+                    <span className="absolute -top-2 -right-2 bg-primary text-white text-xs font-bold rounded-full size-5 flex items-center justify-center">
+                      {totalItems}
+                    </span>
+                  )}
                 </Button>
               </Link>
+              {auth && (
+                <Link href="/admin">
+                  <Button
+                    variant="outline"
+                    size="icon"
+                    className="hover:bg-primary/10 transition-colors relative"
+                  >
+                    <Store className="size-5" />
+                    <span className="sr-only">Tienda</span>
+                  </Button>
+                </Link>
+              )}
             </div>
           </div>
         </div>
