@@ -34,7 +34,7 @@ export default function DashboardPageContent() {
   return (
     <>
       {isLoading ? (
-        <div className="min-h-screen flex justify-center items-center">
+        <div className="flex justify-center items-center">
           <Loader size="lg" />
         </div>
       ) : (

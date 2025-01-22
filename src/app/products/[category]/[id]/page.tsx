@@ -3,6 +3,8 @@
 import { fetchProduct, insertView } from "@/actions/products";
 import Container from "@/components/custom/Container";
 import ProductDetails from "@/components/custom/Products/ProductDetails";
+import ProductReviews from "@/components/custom/Products/ProductReviews";
+import RecommendedProducts from "@/components/custom/Products/RecommendedProducts";
 import Loader from "@/components/Loader";
 import { useAuthStore } from "@/store/authStore";
 import { Product } from "@/types/products";
@@ -38,6 +40,8 @@ export default function ProductPage({
   return (
     <Container>
       {product ? <ProductDetails product={product} /> : <Loader size="lg" />}
+      <RecommendedProducts />
+      <ProductReviews />
     </Container>
   );
 }
