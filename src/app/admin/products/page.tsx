@@ -1,9 +1,9 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import Link from "next/link"
-import { PlusCircle } from 'lucide-react'
-import { Button } from "@/components/ui/button"
+import { useEffect, useState } from "react";
+import Link from "next/link";
+import { PlusCircle } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import {
   Table,
   TableBody,
@@ -11,23 +11,26 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table"
-import { Input } from "@/components/ui/input"
+} from "@/components/ui/table";
+import { Input } from "@/components/ui/input";
+import { Product } from "@/types/products";
+import { getProducts } from "@/actions/products";
+import { CopFormatNumber } from "@/lib/utils";
 
-const products = [
-  { id: 1, name: "Smartphone X", price: 599, stock: 50 },
-  { id: 2, name: "Laptop Pro", price: 1299, stock: 30 },
-  { id: 3, name: "Auriculares Inalámbricos", price: 149, stock: 100 },
-  { id: 4, name: "Smartwatch Elite", price: 299, stock: 75 },
-  { id: 5, name: "Tablet Ultra", price: 449, stock: 40 },
-]
+export const dynamic = "force-dynamic";
 
 export default function ProductsPage() {
-  const [searchTerm, setSearchTerm] = useState("")
-
-  const filteredProducts = products.filter(product =>
+  const [searchTerm, setSearchTerm] = useState("");
+  const [products, setProducts] = useState<Product[]>([]);
+  useEffect(() => {
+    (async () => {
+      const response = await getProducts();
+      setProducts(response);
+    })();
+  }, []);
+  const filteredProducts = products.filter((product) =>
     product.name.toLowerCase().includes(searchTerm.toLowerCase())
-  )
+  );
 
   return (
     <div className="space-y-4">
@@ -59,8 +62,10 @@ export default function ProductsPage() {
         <TableBody>
           {filteredProducts.map((product) => (
             <TableRow key={product.id}>
-              <TableCell>{product.name}</TableCell>
-              <TableCell>${product.price}</TableCell>
+              <TableCell className="max-w-28 text-wrap">
+                {product.name}
+              </TableCell>
+              <TableCell>{CopFormatNumber(product.price)}</TableCell>
               <TableCell>{product.stock}</TableCell>
               <TableCell>
                 <Button variant="outline" size="sm" className="mr-2">
@@ -75,6 +80,5 @@ export default function ProductsPage() {
         </TableBody>
       </Table>
     </div>
-  )
+  );
 }
-

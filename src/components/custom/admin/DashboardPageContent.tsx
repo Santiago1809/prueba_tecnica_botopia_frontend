@@ -24,7 +24,6 @@ export default function DashboardPageContent() {
     }
     (async () => {
       const data = await getStats(token);
-      console.log(data);
       if (!("error" in data)) {
         setStats(data);
       }

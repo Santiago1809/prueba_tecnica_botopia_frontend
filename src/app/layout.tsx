@@ -34,6 +34,8 @@ async function generateMetadata(): Promise<Metadata> {
 }
 
 export const metadata = generateMetadata();
+// Force dynamic rendering for this page
+export const dynamic = 'force-dynamic'
 
 export default function RootLayout({
   children,

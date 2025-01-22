@@ -33,6 +33,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 
+
 const settingsSchema = z.object({
   siteName: z.string().min(1, "El nombre del sitio es requerido"),
   siteDescription: z.string(),

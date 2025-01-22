@@ -42,6 +42,7 @@ const sidebarItems: SidebarItem[] = [
 
 ]
 
+export const dynamic = 'force-dynamic'
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const pathname = window.location.pathname
