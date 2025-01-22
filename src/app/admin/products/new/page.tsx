@@ -1,16 +1,30 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import {
+  Select,
+  SelectTrigger,
+  SelectContent,
+  SelectItem,
+  SelectValue,
+} from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
+import { createProduct } from "@/actions/products";
+import { useAuthStore } from "@/store/authStore";
+import { Category } from "@/types/products";
+import { getCategories } from "@/actions/category";
 
 export default function NewProductPage() {
   const { toast } = useToast();
   const router = useRouter();
+  const { token } = useAuthStore();
+  const [categories, setCategories] = useState<Category[]>([]); // Lista de categorías
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null); // Categoría seleccionada
   const [formData, setFormData] = useState({
     Name: "",
     Price: "",
@@ -19,6 +33,15 @@ export default function NewProductPage() {
   });
   const [imageFiles, setImageFiles] = useState<File[]>([]);
   const [imagePreviews, setImagePreviews] = useState<string[]>([]);
+
+  // Simula obtener las categorías desde una API
+  useEffect(() => {
+    async function fetchCategories() {
+      const response = await getCategories();
+      setCategories(response);
+    }
+    fetchCategories();
+  }, []);
 
   const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -32,7 +55,7 @@ export default function NewProductPage() {
       const files = Array.from(e.target.files);
       setImageFiles(files);
 
-      // Create preview URLs for all files
+      // Crear previews para las imágenes
       const previews = files.map((file) => URL.createObjectURL(file));
       setImagePreviews(previews);
     }
@@ -41,22 +64,35 @@ export default function NewProductPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    // Create FormData to handle file upload
+    if (!selectedCategory) {
+      toast({
+        title: "Categoría no seleccionada",
+        description: "Por favor selecciona una categoría para el producto.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Crear FormData
     const data = {
       ...formData,
+      Category: selectedCategory,
       Images: imageFiles,
     };
 
     const submitData = new FormData();
     Object.entries(data).forEach(([key, value]) => {
       if (typeof value !== "string") {
-        value.forEach((file: File) => {
+        (value as File[]).forEach((file) => {
           submitData.append("Images", file);
         });
       } else {
         submitData.append(key, value);
       }
-    });    
+    });
+
+    const res = await createProduct(submitData, token);
+    if (!res) return;
 
     toast({
       title: "Producto creado",
@@ -70,7 +106,7 @@ export default function NewProductPage() {
       <h2 className="text-3xl font-bold tracking-tight text-gray-800">
         Añadir Nuevo Producto
       </h2>
-      <form onSubmit={handleSubmit} className="space-y-6">
+      <form onSubmit={handleSubmit} className="space-y-6" autoComplete="off">
         <fieldset className="space-y-4">
           <legend className="text-lg font-semibold text-gray-700">
             Información del Producto
@@ -122,6 +158,21 @@ export default function NewProductPage() {
               required
             />
           </div>
+          <div>
+            <Label htmlFor="category">Categoría</Label>
+            <Select onValueChange={(value) => setSelectedCategory(value)}>
+              <SelectTrigger>
+                <SelectValue placeholder="Selecciona una categoría" />
+              </SelectTrigger>
+              <SelectContent>
+                {categories.map((category) => (
+                  <SelectItem key={category.id} value={(category.id as number).toString()}>
+                    {category.Name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
         </fieldset>
 
         <fieldset className="space-y-4">
@@ -140,7 +191,12 @@ export default function NewProductPage() {
                 multiple
                 className="hidden"
               />
-              <Label htmlFor="Images" className="cursor-pointer block bg-black px-4 py-2 rounded text-white">Seleccionar Imágenes</Label>
+              <Label
+                htmlFor="Images"
+                className="cursor-pointer block bg-black px-4 py-2 rounded text-white"
+              >
+                Seleccionar Imágenes
+              </Label>
             </div>
           </div>
           <div className="mt-4 flex gap-4 flex-wrap">

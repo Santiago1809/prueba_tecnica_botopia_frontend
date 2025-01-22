@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import Link from "next/link"
 import { LogOut } from "lucide-react"
+import { usePathname } from "next/navigation"
 
 interface SidebarItem {
   label: string
@@ -45,7 +46,7 @@ const sidebarItems: SidebarItem[] = [
 export const dynamic = 'force-dynamic'
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const [sidebarOpen, setSidebarOpen] = useState(false)
-  const pathname = window.location.pathname
+  const pathname = usePathname()
 
   return (
     <div className="flex min-h-screen bg-gray-100">

@@ -114,30 +114,46 @@ async function getLoggedProducts(token: string) {
       headers: { Authorization: `Bearer ${token}` },
     });
     if (!response.ok) throw new Error(`Error ${response.status}`);
-    const products = []
+    const products = [];
     const { categoryBased, popular } = await response.json();
     products.push(...categoryBased, ...popular);
     products.map((prod: Product) => {
       prod.images = prod.images.map((image) => `${BACKEND_HOST}${image}`);
-    })
+    });
     return products;
   } catch {
-    return []
+    return [];
   }
 }
 
 async function getPublicProducts() {
   try {
     const response = await fetch(`${BACKEND_HOST}/api/public/recommendations`);
-  if (!response.ok) throw new Error(`Error ${response.status}`);
-  const products = [];
-  const { random, popular } = await response.json();
-  products.push(...random, ...popular);
-  products.map((prod: Product) => {
-    prod.images = prod.images.map((image) => `${BACKEND_HOST}${image}`);
-  })
-  return products;
+    if (!response.ok) throw new Error(`Error ${response.status}`);
+    const products = [];
+    const { random, popular } = await response.json();
+    products.push(...random, ...popular);
+    products.map((prod: Product) => {
+      prod.images = prod.images.map((image) => `${BACKEND_HOST}${image}`);
+    });
+    return products;
   } catch {
-    return []
+    return [];
+  }
+}
+export async function createProduct(data: FormData, token: string) {
+  try {
+    const response = await fetch(`${BACKEND_HOST}/api/products/custom-create`, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      body: data,
+    });
+    if (!response.ok) throw new Error(`Error ${response}`);
+    return true;
+  } catch (err) {
+    console.error("Error creating product:");
+    return false;
   }
 }

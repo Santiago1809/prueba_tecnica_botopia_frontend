@@ -7,6 +7,7 @@ import Products from "./Products";
 import Loader from "@/components/Loader";
 import { NEXT_PUBLIC_BACKEND_HOST } from "@/lib/constants";
 import { getProducts } from "@/actions/products";
+import { getCategories } from "@/actions/category";
 
 export default function ProductsContent() {
   const router = useRouter();
@@ -29,25 +30,11 @@ export default function ProductsContent() {
   }, [searchParams]);
   useEffect(() => {
     const fetchCategories = async () => {
-      try {
-        const response = await fetch(
-          `${NEXT_PUBLIC_BACKEND_HOST}/api/categories`
-        );
-        if (!response.ok) throw new Error(`Error ${response.status}`);
-        const { data } = await response.json();
-        const fetchedCategories: Category[] = data.map(
-          (item: ExternalCategoryData) => ({
-            id: item.id,
-            Name: item.Name,
-          })
-        );
-        setCategories(fetchedCategories);
-      } catch (error) {
-        console.error("Error fetching categories:", error);
-      }
-    };
+      const res = await getCategories()
+      setCategories(res)
+    }
     fetchCategories();
-  }, []);
+  }, [])
 
   useEffect(() => {
     const fetchFilteredProducts = async () => {
