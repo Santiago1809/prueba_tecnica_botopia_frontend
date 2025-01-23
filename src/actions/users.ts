@@ -1,6 +1,7 @@
 "use server";
 
 import { BACKEND_HOST } from "@/lib/constants";
+import { User } from "@/types/user";
 import * as z from "zod";
 
 export async function login(prevState: unknown, queryData: FormData) {
@@ -98,7 +99,7 @@ export async function getUsers(token: string) {
 
     return await response.json();
   } catch {
-    return null;
+    return [];
   }
 }
 
@@ -113,6 +114,28 @@ export async function deleteUser(token: string, userId: string) {
 
     if (!response.ok) {
       throw new Error("Error al eliminar el usuario");
+    }
+
+    return true;
+  } catch {
+    return false;
+  }
+}
+export async function editUser(user: User, token: string) {
+  try {
+    const response = await fetch(`${BACKEND_HOST}/api/list-users/${user.documentId}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({
+        data: user,
+      }),
+    });
+
+    if (!response.ok) {
+      throw new Error("Error al actualizar el usuario");
     }
 
     return true;

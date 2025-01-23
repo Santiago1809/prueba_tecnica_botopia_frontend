@@ -1,6 +1,6 @@
 "use client";
 
-import { deleteUser, getUsers } from "@/actions/users";
+import { deleteUser, editUser, getUsers } from "@/actions/users";
 import { EditUserDialog } from "@/components/custom/admin/user/EditUserDialog";
 import { UserDetailsDialog } from "@/components/custom/admin/user/UserDetailsDialog";
 import { UserSearch } from "@/components/custom/admin/user/UserSearch";
@@ -57,10 +57,10 @@ export default function UsersPage() {
     setEditingUser(user);
   };
 
-  const handleSaveUser = (updatedUser: User) => {
-    setUsers(
-      users.map((user) => (user.id === updatedUser.id ? updatedUser : user))
-    );
+  const handleSaveUser = async (updatedUser: User) => {
+    await editUser(updatedUser, token);
+    const res = await getUsers(token);
+    setUsers(res);
     setEditingUser(null);
   };
 
@@ -98,16 +98,14 @@ export default function UsersPage() {
         open={!!selectedUser}
         onOpenChange={(open) => !open && setSelectedUser(null)}
       />
-      {
-        editingUser && (
-          <EditUserDialog
-            user={editingUser}
-            open={!!editingUser}
-            onOpenChange={(open) => !open && setEditingUser(null)}
-            onSave={handleSaveUser}
-          />
-        )
-      }
+      {editingUser && (
+        <EditUserDialog
+          user={editingUser}
+          open={!!editingUser}
+          onOpenChange={(open) => !open && setEditingUser(null)}
+          onSave={handleSaveUser}
+        />
+      )}
     </Card>
   );
 }
