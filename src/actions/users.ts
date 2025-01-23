@@ -101,3 +101,22 @@ export async function getUsers(token: string) {
     return null;
   }
 }
+
+export async function deleteUser(token: string, userId: string) {
+  try {
+    const response = await fetch(`${BACKEND_HOST}/api/list-users/${userId}`, {
+      method: "DELETE",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error("Error al eliminar el usuario");
+    }
+
+    return true;
+  } catch {
+    return false;
+  }
+}

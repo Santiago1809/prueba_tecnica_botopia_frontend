@@ -1,6 +1,6 @@
 "use client";
 
-import { getUsers } from "@/actions/users";
+import { deleteUser, getUsers } from "@/actions/users";
 import { EditUserDialog } from "@/components/custom/admin/user/EditUserDialog";
 import { UserDetailsDialog } from "@/components/custom/admin/user/UserDetailsDialog";
 import { UserSearch } from "@/components/custom/admin/user/UserSearch";
@@ -64,8 +64,10 @@ export default function UsersPage() {
     setEditingUser(null);
   };
 
-  const handleDeleteUser = (userToDelete: User) => {
-    setUsers(users.filter((user) => user.id !== userToDelete.id));
+  const handleDeleteUser = async (userToDelete: User) => {
+    await deleteUser(token, userToDelete.documentId);
+    const res = await getUsers(token);
+    setUsers(res);
   };
 
   return (
@@ -78,9 +80,6 @@ export default function UsersPage() {
       <CardContent>
         <div className="flex items-center justify-between mb-4">
           <UserSearch searchTerm={searchTerm} setSearchTerm={setSearchTerm} />
-          <Button>
-            <UserPlus className="mr-2 h-4 w-4" /> Añadir Usuario
-          </Button>
         </div>
         <div className="rounded-md border">
           <UserTable
