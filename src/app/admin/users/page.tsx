@@ -1,92 +1,114 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table"
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-import { MoreHorizontal } from 'lucide-react'
-
-
-const initialUsers = [
-  { id: 1, name: "Alice Johnson", email: "alice@example.com", role: "Cliente" },
-  { id: 2, name: "Bob Smith", email: "bob@example.com", role: "Cliente" },
-  { id: 3, name: "Charlie Brown", email: "charlie@example.com", role: "Admin" },
-  { id: 4, name: "Diana Ross", email: "diana@example.com", role: "Cliente" },
-  { id: 5, name: "Edward Norton", email: "edward@example.com", role: "Cliente" },
-]
+import { getUsers } from "@/actions/users";
+import { EditUserDialog } from "@/components/custom/admin/user/EditUserDialog";
+import { UserDetailsDialog } from "@/components/custom/admin/user/UserDetailsDialog";
+import { UserSearch } from "@/components/custom/admin/user/UserSearch";
+import { UserTable } from "@/components/custom/admin/user/UserTable";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { useAuthStore } from "@/store/authStore";
+import type { User } from "@/types/user";
+import { UserPlus } from "lucide-react";
+import { useEffect, useState } from "react";
 
 export default function UsersPage() {
-  const [users, setUsers] = useState(initialUsers)
-  const [searchTerm, setSearchTerm] = useState("")
+  const [users, setUsers] = useState<User[]>([]);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [selectedUser, setSelectedUser] = useState<User | null>(null);
+  const [editingUser, setEditingUser] = useState<User | null>(null);
+  const [sortColumn, setSortColumn] = useState<keyof User>("display_name");
+  const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
+  const { token } = useAuthStore();
 
-  const filteredUsers = users.filter(user =>
-    user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    user.email.toLowerCase().includes(searchTerm.toLowerCase())
-  )
+  useEffect(() => {
+    (async () => {
+      const res = await getUsers(token);
+      if (res.error) {
+        console.error("Error al obtener usuarios:", res.error);
+        return;
+      }
+      setUsers(res);
+    })();
+  }, []);
+
+  const filteredUsers = users.filter(
+    (user) =>
+      user.display_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      user.email.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  const sortedUsers = [...filteredUsers].sort((a, b) => {
+    if (a[sortColumn] < b[sortColumn]) return sortDirection === "asc" ? -1 : 1;
+    if (a[sortColumn] > b[sortColumn]) return sortDirection === "asc" ? 1 : -1;
+    return 0;
+  });
+
+  const handleSort = (column: keyof User) => {
+    if (column === sortColumn) {
+      setSortDirection(sortDirection === "asc" ? "desc" : "asc");
+    } else {
+      setSortColumn(column);
+      setSortDirection("asc");
+    }
+  };
+
+  const handleEditUser = (user: User) => {
+    setEditingUser(user);
+  };
+
+  const handleSaveUser = (updatedUser: User) => {
+    setUsers(
+      users.map((user) => (user.id === updatedUser.id ? updatedUser : user))
+    );
+    setEditingUser(null);
+  };
+
+  const handleDeleteUser = (userToDelete: User) => {
+    setUsers(users.filter((user) => user.id !== userToDelete.id));
+  };
 
   return (
-    <div className="space-y-4">
-      <h2 className="text-3xl font-bold tracking-tight">Gestión de Usuarios</h2>
-      <div className="flex items-center py-4">
-        <Input
-          placeholder="Buscar usuarios..."
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          className="max-w-sm"
-        />
-      </div>
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead>Nombre</TableHead>
-            <TableHead>Email</TableHead>
-            <TableHead>Rol</TableHead>
-            <TableHead>Acciones</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {filteredUsers.map((user) => (
-            <TableRow key={user.id}>
-              <TableCell>{user.name}</TableCell>
-              <TableCell>{user.email}</TableCell>
-              <TableCell>{user.role}</TableCell>
-              <TableCell>
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" className="h-8 w-8 p-0">
-                      <span className="sr-only">Abrir menú</span>
-                      <MoreHorizontal className="h-4 w-4" />
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end">
-                    <DropdownMenuLabel>Acciones</DropdownMenuLabel>
-                    <DropdownMenuItem>Ver perfil</DropdownMenuItem>
-                    <DropdownMenuItem>Editar usuario</DropdownMenuItem>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem className="text-red-600">Eliminar usuario</DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              </TableCell>
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
-    </div>
-  )
+    <Card className="w-full">
+      <CardHeader>
+        <CardTitle className="text-2xl font-bold">
+          Gestión de Usuarios
+        </CardTitle>
+      </CardHeader>
+      <CardContent>
+        <div className="flex items-center justify-between mb-4">
+          <UserSearch searchTerm={searchTerm} setSearchTerm={setSearchTerm} />
+          <Button>
+            <UserPlus className="mr-2 h-4 w-4" /> Añadir Usuario
+          </Button>
+        </div>
+        <div className="rounded-md border">
+          <UserTable
+            users={sortedUsers}
+            sortColumn={sortColumn}
+            sortDirection={sortDirection}
+            onSort={handleSort}
+            onViewDetails={setSelectedUser}
+            onEditUser={handleEditUser}
+            onDeleteUser={handleDeleteUser}
+          />
+        </div>
+      </CardContent>
+      <UserDetailsDialog
+        user={selectedUser}
+        open={!!selectedUser}
+        onOpenChange={(open) => !open && setSelectedUser(null)}
+      />
+      {
+        editingUser && (
+          <EditUserDialog
+            user={editingUser}
+            open={!!editingUser}
+            onOpenChange={(open) => !open && setEditingUser(null)}
+            onSave={handleSaveUser}
+          />
+        )
+      }
+    </Card>
+  );
 }
-

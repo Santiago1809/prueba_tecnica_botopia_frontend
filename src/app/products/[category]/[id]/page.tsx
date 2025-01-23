@@ -1,4 +1,5 @@
 "use client";
+import './style.css'
 
 import { fetchProduct, insertView } from "@/actions/products";
 import Container from "@/components/custom/Container";

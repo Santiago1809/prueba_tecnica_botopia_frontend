@@ -84,3 +84,20 @@ export async function register(prevState: unknown, queryData: FormData) {
     return { error: "Error desconocido en el registro" };
   }
 }
+export async function getUsers(token: string) {
+  try {
+    const response = await fetch(`${BACKEND_HOST}/api/list-users`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error("Error al obtener los usuarios");
+    }
+
+    return await response.json();
+  } catch {
+    return null;
+  }
+}
