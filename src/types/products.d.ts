@@ -1,12 +1,12 @@
 export interface Product {
   id: number;
-  documentId?: string;
+  documentId: string;
   name: string;
   price: number;
   images: string[];
   category: Category;
   description?: string;
-  stock?: number;
+  stock: number;
 }
 
 export interface Category {

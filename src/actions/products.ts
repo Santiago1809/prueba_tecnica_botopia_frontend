@@ -157,3 +157,48 @@ export async function createProduct(data: FormData, token: string) {
     return false;
   }
 }
+export async function deleteProduct(id: string, token: string) {
+  try {
+    const response = await fetch(`${BACKEND_HOST}/api/products/${id}`, {
+      method: "DELETE",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    if (!response.ok) throw new Error(`Error ${response}`);
+    return true;
+  } catch (err) {
+    return false;
+  }
+}
+export async function updateProduct(product: any, token: string) {
+  try {
+    const sendProduct = {
+      data: {
+        Name: product.name,
+        Price: product.price,
+        Stock: product.stock,
+      },
+    };
+    const response = await fetch(
+      `${BACKEND_HOST}/api/products/${product.documentId}`,
+      {
+        method: "PUT",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(sendProduct),
+      }
+    );
+    if (!response.ok) throw new Error(JSON.stringify(await response.json()));
+    console.log(product);
+
+    return true;
+  } catch (err) {
+    console.error(
+      (err as Error).message
+    );
+    return false;
+  }
+}
