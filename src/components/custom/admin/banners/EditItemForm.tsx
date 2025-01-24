@@ -10,12 +10,12 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
-import { BannerAndPopUp } from "@/types/banner";
+import { Banner } from "@/types/banner";
 import { Upload } from "lucide-react";
 
 interface EditItemDialogProps {
-  item: BannerAndPopUp | null;
-  onSave: (item: BannerAndPopUp) => void;
+  item: Banner | null;
+  onSave: (item: Banner) => void;
   onCancel: () => void;
 }
 
@@ -24,7 +24,7 @@ export function EditItemDialog({
   onSave,
   onCancel,
 }: EditItemDialogProps) {
-  const [editedItem, setEditedItem] = useState<BannerAndPopUp | null>(item);
+  const [editedItem, setEditedItem] = useState<Banner | null>(item);
 
   useEffect(() => {
     setEditedItem(item);

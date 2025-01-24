@@ -12,12 +12,12 @@ import { NewItemForm } from "@/components/custom/admin/banners/NewItemForm";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { useAuthStore } from "@/store/authStore";
-import { BannerAndPopUp } from "@/types/banner";
+import { Banner } from "@/types/banner";
 import { useEffect, useState } from "react";
 
 export default function BannersPage() {
-  const [banners, setBanners] = useState<BannerAndPopUp[]>([]);
-  const [editingItem, setEditingItem] = useState<BannerAndPopUp | null>(null);
+  const [banners, setBanners] = useState<Banner[]>([]);
+  const [editingItem, setEditingItem] = useState<Banner | null>(null);
   const { toast } = useToast();
   const { token } = useAuthStore();
 
@@ -57,11 +57,11 @@ export default function BannersPage() {
     });
   };
 
-  const handleEditItem = (item: BannerAndPopUp) => {
+  const handleEditItem = (item: Banner) => {
     setEditingItem(item);
   };
 
-  const handleSaveEdit = async (editedItem: BannerAndPopUp) => {
+  const handleSaveEdit = async (editedItem: Banner) => {
     await updateBanner(token, editedItem);
     const res = await getBanners(token);
     setEditingItem(null);

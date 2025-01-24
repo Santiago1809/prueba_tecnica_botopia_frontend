@@ -9,14 +9,14 @@ import {
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Trash2, Edit } from "lucide-react";
-import type { BannerAndPopUp } from "@/types/banner";
+import type { Banner } from "@/types/banner";
 import Image from "next/image";
 
 interface ItemTableProps {
-  items: BannerAndPopUp[];
+  items: Banner[];
   onToggle: (id: number) => void;
   onDelete: (id: string) => void;
-  onEdit: (item: BannerAndPopUp) => void;
+  onEdit: (item: Banner) => void;
 }
 
 export function ItemTable({

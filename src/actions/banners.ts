@@ -1,6 +1,6 @@
 "use server";
 import { BACKEND_HOST } from "@/lib/constants";
-import { BannerAndPopUp } from "@/types/banner";
+import { Banner } from "@/types/banner";
 
 export async function getActiveBanners(token: string) {
   try {
@@ -16,7 +16,7 @@ export async function getActiveBanners(token: string) {
       throw new Error("Error fetching banners");
     }
     const { data } = await response.json();
-    return data.map((banner: BannerAndPopUp) => {
+    return data.map((banner: Banner) => {
       return {
         ...banner,
         Image: {
@@ -43,7 +43,7 @@ export async function getBanners(token: string) {
       throw new Error("Error fetching banners");
     }
     const { data } = await response.json();
-    return data.map((banner: BannerAndPopUp) => {
+    return data.map((banner: Banner) => {
       return {
         ...banner,
         Image: {
@@ -74,10 +74,7 @@ export async function saveBanner(token: string, banner: FormData) {
   }
 }
 
-export async function updateBanner(
-  token: String,
-  banner: Partial<BannerAndPopUp>
-) {
+export async function updateBanner(token: String, banner: Partial<Banner>) {
   try {
     const response = await fetch(
       `${BACKEND_HOST}/api/banners/${banner.documentId}`,

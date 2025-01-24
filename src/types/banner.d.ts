@@ -1,6 +1,6 @@
 import { Image } from "./products";
 
-export interface BannerAndPopUp {
+export interface Banner {
   id: number;
   documentId: string;
   Title: string;

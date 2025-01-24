@@ -4,14 +4,14 @@ import { getActiveBanners } from "@/actions/banners";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useAuthStore } from "@/store/authStore";
-import { BannerAndPopUp } from "@/types/banner";
+import { Banner } from "@/types/banner";
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 
 export default function Banners() {
   const [currentBanner, setCurrentBanner] = useState(0);
-  const [banners, setBanners] = useState<BannerAndPopUp[]>([]);
+  const [banners, setBanners] = useState<Banner[]>([]);
   const { token } = useAuthStore();
   const autoPlayDelay = 5000; // Cambiar banner cada 5 segundos
 
