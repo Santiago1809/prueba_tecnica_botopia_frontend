@@ -1,7 +1,7 @@
 "use client"
 import { useState } from "react"
 import { cn } from "@/lib/utils"
-import { LayoutDashboard, Megaphone, Menu, Settings, ShoppingBasket, Users, X } from "lucide-react"
+import { LayoutDashboard, Megaphone, Menu, Settings, ShoppingBasket, Truck, Users, X } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import Link from "next/link"
@@ -21,12 +21,12 @@ const sidebarItems: SidebarItem[] = [
     icon: () => <LayoutDashboard />,
   },
   {
-    label: "Products",
+    label: "Productos",
     href: "/admin/products",
     icon: () => <ShoppingBasket />,
   },
   {
-    label: "Users",
+    label: "Usuarios",
     href: "/admin/users",
     icon: () => <Users />,
   },
@@ -36,10 +36,10 @@ const sidebarItems: SidebarItem[] = [
     icon: () => <Megaphone />
   },
   {
-    label: "Settings",
-    href: "/admin/settings",
-    icon: () => <Settings />
-  },
+    label: "Pedidos",
+    href: "/admin/orders",
+    icon: () => <Truck />
+  }
 
 ]
 

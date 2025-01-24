@@ -1,5 +1,6 @@
 "use server";
 import { BACKEND_HOST, HOST_LOCAL } from "@/lib/constants";
+import { Order } from "@/types/order";
 import { revalidatePath } from "next/cache";
 
 export async function getOrdersByUser(username: string, token: string) {
@@ -39,7 +40,7 @@ export async function createCheckoutSession(formData: FormData) {
     }
 
     revalidatePath("/checkout");
-    return data
+    return data;
   } catch (error) {
     return { error: (error as Error).message };
   }
@@ -77,4 +78,44 @@ export async function createPayPalOrder(formData: FormData) {
   } catch (error) {
     return { error: (error as Error).message };
   }
+}
+export async function getOrders(token: string) {
+  const response = await fetch(`${BACKEND_HOST}/api/get-sales`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  if (!response.ok) throw new Error(`Error ${response.status}`);
+  const data = await response.json();
+  return data;
+}
+export async function updateOrderStage(token: string, order: Order) {
+  console.log({ order });
+
+  const response = await fetch(
+    `${BACKEND_HOST}/api/orders/${order.documentId}`,
+    {
+      method: "PUT",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        data: {
+          Stage: order.Stage,
+        },
+      }),
+    }
+  );
+  if (!response.ok) throw new Error(`Error ${response.status}`);
+}
+export async function deleteOrder(token: string, order:Order) {
+  const response = await fetch(`${BACKEND_HOST}/api/orders/${order.documentId}`, {
+    method: "DELETE",
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  if (!response.ok) throw new Error(`Error ${response.status}`);
+  
 }

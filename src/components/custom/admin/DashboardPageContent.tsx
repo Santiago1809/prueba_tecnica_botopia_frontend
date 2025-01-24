@@ -39,6 +39,7 @@ export default function DashboardPageContent() {
       ) : (
         <div className="space-y-8">
           <h2 className="text-3xl font-bold tracking-tight">Dashboard</h2>
+          <h3 className="text-2xl  font-semibold">Estadísticas del ultimo mes</h3>
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
             {stats?.cards.map((card, index) => (
               <DataCards card={card} key={index} />

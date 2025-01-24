@@ -1,4 +1,5 @@
 import { Product } from "./products"
+import { User } from "./user"
 
 export interface Order {
   createdAt: string
@@ -10,7 +11,11 @@ export interface Order {
   Products: OrderProduct[]
   PaymentMethod: string
   Stage: OrderStageType,
-  TotalPrice: number
+  TotalPrice: number,
+  user: User,
+  DeliveryAddress: string,
+  City: string,
+  Country: string,
 }
 interface OrderProduct extends Product {
   quantity: number
