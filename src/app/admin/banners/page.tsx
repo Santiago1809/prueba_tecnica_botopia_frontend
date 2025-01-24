@@ -1,86 +1,68 @@
 "use client";
 
-import { useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
-import { Switch } from "@/components/ui/switch";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
+import { getBanners } from "@/actions/banners";
+import { EditItemDialog } from "@/components/custom/admin/banners/EditItemForm";
+import { ItemTable } from "@/components/custom/admin/banners/ItemTable";
+import { NewItemForm } from "@/components/custom/admin/banners/NewItemForm";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
-import { Trash2, Edit } from "lucide-react";
+import { useAuthStore } from "@/store/authStore";
+import { BannerAndPopUp } from "@/types/banner";
+import { useEffect, useState } from "react";
 
-interface Item {
-  id: number;
-  title: string;
-  content: string;
-  active: boolean;
-}
-
-const initialBanners: Item[] = [
+const initialPopups: BannerAndPopUp[] = [
   {
     id: 1,
-    title: "Oferta de Verano",
-    content: "Descuentos de hasta 50% en productos seleccionados",
-    active: true,
+    documentId: "popup1",
+    Title: "Suscríbete al Newsletter",
+    Url: "/subscribe",
+    ButtonText: "Suscribirse",
+    Image: { id: 3, documentId: "img3", url: "/images/newsletter.jpg" },
+    Active: true,
   },
   {
     id: 2,
-    title: "Descuento en Electrónicos",
-    content: "Llévate un 20% de descuento en todos los electrónicos",
-    active: false,
-  },
-];
-
-const initialPopups: Item[] = [
-  {
-    id: 1,
-    title: "Suscríbete al Newsletter",
-    content: "Recibe las últimas noticias y ofertas exclusivas",
-    active: true,
-  },
-  {
-    id: 2,
-    title: "Encuesta de Satisfacción",
-    content: "Ayúdanos a mejorar respondiendo nuestra encuesta",
-    active: false,
+    documentId: "popup2",
+    Title: "Encuesta de Satisfacción",
+    Url: "/survey",
+    ButtonText: "Participar",
+    Image: { id: 4, documentId: "img4", url: "/images/survey.jpg" },
+    Active: false,
   },
 ];
 
 export default function BannersAndPopupsPage() {
-  const [banners, setBanners] = useState<Item[]>(initialBanners);
-  const [popups, setPopups] = useState<Item[]>(initialPopups);
-  const [newItem, setNewItem] = useState<Omit<Item, "id" | "active">>({
-    title: "",
-    content: "",
-  });
+  const [banners, setBanners] = useState<BannerAndPopUp[]>([]);
+  const [popups, setPopups] = useState<BannerAndPopUp[]>(initialPopups);
+  const [editingItem, setEditingItem] = useState<BannerAndPopUp | null>(null);
   const { toast } = useToast();
+  const { token } = useAuthStore();
+
+  useEffect(() => {
+    const fetchBanners = async () => {
+      const res = await getBanners(token);
+      setBanners(res || []); // Ensure it's always an array
+    };
+    fetchBanners();
+  }, []);
 
   const handleToggle = (
     id: number,
-    items: Item[],
-    setItems: React.Dispatch<React.SetStateAction<Item[]>>
+    items: BannerAndPopUp[],
+    setItems: React.Dispatch<React.SetStateAction<BannerAndPopUp[]>>
   ) => {
     setItems(
       items.map((item) =>
-        item.id === id ? { ...item, active: !item.active } : item
+        item.id === id ? { ...item, Active: !item.Active } : item
       )
     );
   };
 
   const handleDelete = (
     id: number,
-    items: Item[],
-    setItems: React.Dispatch<React.SetStateAction<Item[]>>
+    items: BannerAndPopUp[],
+    setItems: React.Dispatch<React.SetStateAction<BannerAndPopUp[]>>
   ) => {
     setItems(items.filter((item) => item.id !== id));
     toast({
@@ -90,106 +72,39 @@ export default function BannersAndPopupsPage() {
   };
 
   const handleNewItemSubmit = (
-    e: React.FormEvent,
-    items: Item[],
-    setItems: React.Dispatch<React.SetStateAction<Item[]>>
+    newItem: Omit<BannerAndPopUp, "id" | "documentId">,
+    items: BannerAndPopUp[],
+    setItems: React.Dispatch<React.SetStateAction<BannerAndPopUp[]>>
   ) => {
-    e.preventDefault();
-    if (newItem.title.trim() === "" || newItem.content.trim() === "") {
-      toast({
-        title: "Error",
-        description: "Por favor, completa todos los campos.",
-        variant: "destructive",
-      });
-      return;
-    }
-    setItems([...items, { id: Date.now(), ...newItem, active: true }]);
-    setNewItem({ title: "", content: "" });
+    const newId = Math.max(...items.map((item) => item.id)) + 1;
+    const newDocumentId = `item${newId}`;
+    setItems([...items, { id: newId, documentId: newDocumentId, ...newItem }]);
     toast({
       title: "Elemento añadido",
       description: "El nuevo elemento ha sido añadido exitosamente.",
     });
   };
 
-  const ItemTable = ({
-    items,
-    setItems,
-    itemType,
-  }: {
-    items: Item[];
-    setItems: React.Dispatch<React.SetStateAction<Item[]>>;
-    itemType: string;
-  }) => (
-    <Table>
-      <TableHeader>
-        <TableRow>
-          <TableHead>Título</TableHead>
-          <TableHead>Contenido</TableHead>
-          <TableHead>Estado</TableHead>
-          <TableHead>Acciones</TableHead>
-        </TableRow>
-      </TableHeader>
-      <TableBody>
-        {items.map((item) => (
-          <TableRow key={item.id}>
-            <TableCell className="font-medium">{item.title}</TableCell>
-            <TableCell className="max-w-xs truncate">{item.content}</TableCell>
-            <TableCell>
-              <Switch
-                checked={item.active}
-                onCheckedChange={() => handleToggle(item.id, items, setItems)}
-              />
-            </TableCell>
-            <TableCell>
-              <div className="flex space-x-2">
-                <Button variant="outline" size="icon">
-                  <Edit className="h-4 w-4" />
-                </Button>
-                <Button
-                  variant="outline"
-                  size="icon"
-                  onClick={() => handleDelete(item.id, items, setItems)}
-                >
-                  <Trash2 className="h-4 w-4" />
-                </Button>
-              </div>
-            </TableCell>
-          </TableRow>
-        ))}
-      </TableBody>
-    </Table>
-  );
+  const handleEditItem = (item: BannerAndPopUp) => {
+    setEditingItem(item);
+  };
 
-  const NewItemForm = ({
-    onSubmit,
-    itemType,
-  }: {
-    onSubmit: (e: React.FormEvent) => void;
-    itemType: string;
-  }) => (
-    <form onSubmit={onSubmit} className="space-y-4">
-      <h4 className="text-lg font-semibold">Añadir Nuevo {itemType}</h4>
-      <div className="space-y-2">
-        <Label htmlFor={`${itemType.toLowerCase()}Title`}>Título</Label>
-        <Input
-          id={`${itemType.toLowerCase()}Title`}
-          value={newItem.title}
-          onChange={(e) => setNewItem({ ...newItem, title: e.target.value })}
-          required
-        />
-      </div>
-      <div className="space-y-2">
-        <Label htmlFor={`${itemType.toLowerCase()}Content`}>Contenido</Label>
-        <Textarea
-          id={`${itemType.toLowerCase()}Content`}
-          value={newItem.content}
-          onChange={(e) => setNewItem({ ...newItem, content: e.target.value })}
-          required
-        />
-      </div>
-      <Button type="submit">Añadir {itemType}</Button>
-    </form>
-  );
+  const handleSaveEdit = (editedItem: BannerAndPopUp) => {
+    const updateItems = (items: BannerAndPopUp[]) =>
+      items.map((item) => (item.id === editedItem.id ? editedItem : item));
+
+    if (banners.some((banner) => banner.id === editedItem.id)) {
+      setBanners(updateItems);
+    } else {
+      setPopups(updateItems);
+    }
+
+    setEditingItem(null);
+    toast({
+      title: "Elemento actualizado",
+      description: "El elemento ha sido actualizado exitosamente.",
+    });
+  };
 
   return (
     <div className="space-y-8">
@@ -209,11 +124,14 @@ export default function BannersAndPopupsPage() {
             <CardContent className="space-y-6">
               <ItemTable
                 items={banners}
-                setItems={setBanners}
-                itemType="Banner"
+                onToggle={(id) => handleToggle(id, banners, setBanners)}
+                onDelete={(id) => handleDelete(id, banners, setBanners)}
+                onEdit={handleEditItem}
               />
               <NewItemForm
-                onSubmit={(e) => handleNewItemSubmit(e, banners, setBanners)}
+                onSubmit={(newItem) =>
+                  handleNewItemSubmit(newItem, banners, setBanners)
+                }
                 itemType="Banner"
               />
             </CardContent>
@@ -228,17 +146,26 @@ export default function BannersAndPopupsPage() {
             <CardContent className="space-y-6">
               <ItemTable
                 items={popups}
-                setItems={setPopups}
-                itemType="Pop-up"
+                onToggle={(id) => handleToggle(id, popups, setPopups)}
+                onDelete={(id) => handleDelete(id, popups, setPopups)}
+                onEdit={handleEditItem}
               />
               <NewItemForm
-                onSubmit={(e) => handleNewItemSubmit(e, popups, setPopups)}
+                onSubmit={(newItem) =>
+                  handleNewItemSubmit(newItem, popups, setPopups)
+                }
                 itemType="Pop-up"
               />
             </CardContent>
           </Card>
         </TabsContent>
       </Tabs>
+
+      <EditItemDialog
+        item={editingItem}
+        onSave={handleSaveEdit}
+        onCancel={() => setEditingItem(null)}
+      />
     </div>
   );
 }
