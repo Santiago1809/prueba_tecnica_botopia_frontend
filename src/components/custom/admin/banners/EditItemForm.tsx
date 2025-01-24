@@ -103,33 +103,6 @@ export function EditItemDialog({
             />
           </div>
           <div className="grid grid-cols-4 items-center gap-4">
-            <Label htmlFor="edit-image" className="text-right">
-              Imagen
-            </Label>
-            <div className="col-span-3 flex items-center space-x-2">
-              <Input
-                id="edit-image"
-                type="file"
-                accept="image/*"
-                onChange={handleImageChange}
-                className="hidden"
-                ref={fileInputRef}
-              />
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => fileInputRef.current?.click()}
-              >
-                <Upload className="mr-2 h-4 w-4" /> Cambiar Imagen
-              </Button>
-              {editedItem.Image.url && (
-                <span className="text-sm text-gray-500">
-                  Imagen seleccionada
-                </span>
-              )}
-            </div>
-          </div>
-          <div className="grid grid-cols-4 items-center gap-4">
             <Label htmlFor="edit-active" className="text-right">
               Activo
             </Label>

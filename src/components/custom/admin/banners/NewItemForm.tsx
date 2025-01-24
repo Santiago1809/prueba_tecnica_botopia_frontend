@@ -2,34 +2,37 @@ import { useState, useRef } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import type { BannerAndPopUp } from "@/types/banner"
 import { Upload } from "lucide-react"
 
 interface NewItemFormProps {
-  onSubmit: (newItem: Omit<BannerAndPopUp, "id" | "documentId">) => void
+  // Change the type definition if your submission handler expects a FormData
+  onSubmit: (formData: FormData) => void
   itemType: string
 }
 
 export function NewItemForm({ onSubmit, itemType }: NewItemFormProps) {
-  const [newItem, setNewItem] = useState<Omit<BannerAndPopUp, "id" | "documentId">>({
-    Title: "",
-    Url: "",
-    ButtonText: "",
-    Image: { id: 0, documentId: "", url: "" },
-    Active: true,
-  })
+  const [title, setTitle] = useState("")
+  const [url, setUrl] = useState("")
+  const [buttonText, setButtonText] = useState("")
+  const [selectedFile, setSelectedFile] = useState<File | null>(null)
+  const [previewUrl, setPreviewUrl] = useState("")
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    onSubmit(newItem)
-    setNewItem({
-      Title: "",
-      Url: "",
-      ButtonText: "",
-      Image: { id: 0, documentId: "", url: "" },
-      Active: true,
-    })
+    const formData = new FormData()
+    formData.append("Title", title)
+    formData.append("Url", url)
+    formData.append("ButtonText", buttonText)
+    if (selectedFile) {
+      formData.append("Image", selectedFile)
+    }
+    onSubmit(formData)
+    setTitle("")
+    setUrl("")
+    setButtonText("")
+    setSelectedFile(null)
+    setPreviewUrl("")
     if (fileInputRef.current) {
       fileInputRef.current.value = ""
     }
@@ -38,16 +41,10 @@ export function NewItemForm({ onSubmit, itemType }: NewItemFormProps) {
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
     if (file) {
+      setSelectedFile(file)
       const reader = new FileReader()
       reader.onloadend = () => {
-        setNewItem({
-          ...newItem,
-          Image: {
-            id: 0,
-            documentId: "",
-            url: reader.result as string,
-          },
-        })
+        setPreviewUrl(reader.result as string)
       }
       reader.readAsDataURL(file)
     }
@@ -60,8 +57,8 @@ export function NewItemForm({ onSubmit, itemType }: NewItemFormProps) {
         <Label htmlFor="title">Título</Label>
         <Input
           id="title"
-          value={newItem.Title}
-          onChange={(e) => setNewItem({ ...newItem, Title: e.target.value })}
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
           required
         />
       </div>
@@ -69,8 +66,8 @@ export function NewItemForm({ onSubmit, itemType }: NewItemFormProps) {
         <Label htmlFor="url">URL</Label>
         <Input
           id="url"
-          value={newItem.Url}
-          onChange={(e) => setNewItem({ ...newItem, Url: e.target.value })}
+          value={url}
+          onChange={(e) => setUrl(e.target.value)}
           required
         />
       </div>
@@ -78,8 +75,8 @@ export function NewItemForm({ onSubmit, itemType }: NewItemFormProps) {
         <Label htmlFor="buttonText">Texto del Botón</Label>
         <Input
           id="buttonText"
-          value={newItem.ButtonText}
-          onChange={(e) => setNewItem({ ...newItem, ButtonText: e.target.value })}
+          value={buttonText}
+          onChange={(e) => setButtonText(e.target.value)}
           required
         />
       </div>
@@ -97,11 +94,12 @@ export function NewItemForm({ onSubmit, itemType }: NewItemFormProps) {
           <Button type="button" variant="outline" onClick={() => fileInputRef.current?.click()}>
             <Upload className="mr-2 h-4 w-4" /> Subir Imagen
           </Button>
-          {newItem.Image.url && <span className="text-sm text-gray-500">Imagen seleccionada</span>}
+          {previewUrl && (
+            <span className="text-sm text-gray-500">Imagen seleccionada</span>
+          )}
         </div>
       </div>
       <Button type="submit">Añadir {itemType}</Button>
     </form>
   )
 }
-

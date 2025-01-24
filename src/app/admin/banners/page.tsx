@@ -1,6 +1,6 @@
 "use client";
 
-import { getBanners } from "@/actions/banners";
+import { getBanners, saveBanner } from "@/actions/banners";
 import { EditItemDialog } from "@/components/custom/admin/banners/EditItemForm";
 import { ItemTable } from "@/components/custom/admin/banners/ItemTable";
 import { NewItemForm } from "@/components/custom/admin/banners/NewItemForm";
@@ -71,14 +71,13 @@ export default function BannersAndPopupsPage() {
     });
   };
 
-  const handleNewItemSubmit = (
-    newItem: Omit<BannerAndPopUp, "id" | "documentId">,
-    items: BannerAndPopUp[],
+  const handleNewItemSubmit = async (
+    newItem: FormData,
     setItems: React.Dispatch<React.SetStateAction<BannerAndPopUp[]>>
   ) => {
-    const newId = Math.max(...items.map((item) => item.id)) + 1;
-    const newDocumentId = `item${newId}`;
-    setItems([...items, { id: newId, documentId: newDocumentId, ...newItem }]);
+    await saveBanner(token, newItem);
+    const res = await getBanners(token);
+    setItems(res);
     toast({
       title: "Elemento añadido",
       description: "El nuevo elemento ha sido añadido exitosamente.",
@@ -129,9 +128,7 @@ export default function BannersAndPopupsPage() {
                 onEdit={handleEditItem}
               />
               <NewItemForm
-                onSubmit={(newItem) =>
-                  handleNewItemSubmit(newItem, banners, setBanners)
-                }
+                onSubmit={(newItem) => handleNewItemSubmit(newItem, setBanners)}
                 itemType="Banner"
               />
             </CardContent>
@@ -151,9 +148,7 @@ export default function BannersAndPopupsPage() {
                 onEdit={handleEditItem}
               />
               <NewItemForm
-                onSubmit={(newItem) =>
-                  handleNewItemSubmit(newItem, popups, setPopups)
-                }
+                onSubmit={(newItem) => handleNewItemSubmit(newItem, setPopups)}
                 itemType="Pop-up"
               />
             </CardContent>
