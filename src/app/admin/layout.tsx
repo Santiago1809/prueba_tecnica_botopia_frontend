@@ -1,17 +1,26 @@
-"use client"
-import { useState } from "react"
-import { cn } from "@/lib/utils"
-import { LayoutDashboard, Megaphone, Menu, Settings, ShoppingBasket, Truck, Users, X } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { ScrollArea } from "@/components/ui/scroll-area"
-import Link from "next/link"
-import { LogOut } from "lucide-react"
-import { usePathname } from "next/navigation"
+"use client";
+import { Button } from "@/components/ui/button";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { cn } from "@/lib/utils";
+import {
+  LayoutDashboard,
+  LogOut,
+  Megaphone,
+  Menu,
+  PictureInPicture2,
+  ShoppingBasket,
+  Truck,
+  Users,
+  X,
+} from "lucide-react";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { useState } from "react";
 
 interface SidebarItem {
-  label: string
-  href: string
-  icon: any
+  label: string;
+  href: string;
+  icon: any;
 }
 
 const sidebarItems: SidebarItem[] = [
@@ -33,20 +42,28 @@ const sidebarItems: SidebarItem[] = [
   {
     label: "Banners",
     href: "/admin/banners",
-    icon: () => <Megaphone />
+    icon: () => <Megaphone />,
+  },
+  {
+    label: "PopUps",
+    href: "/admin/popups",
+    icon: () => <PictureInPicture2 />,
   },
   {
     label: "Pedidos",
     href: "/admin/orders",
-    icon: () => <Truck />
-  }
+    icon: () => <Truck />,
+  },
+];
 
-]
-
-export const dynamic = 'force-dynamic'
-export default function AdminLayout({ children }: { children: React.ReactNode }) {
-  const [sidebarOpen, setSidebarOpen] = useState(false)
-  const pathname = usePathname()
+export const dynamic = "force-dynamic";
+export default function AdminLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const pathname = usePathname();
 
   return (
     <div className="flex min-h-screen bg-gray-100">
@@ -54,7 +71,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       <aside
         className={cn(
           "fixed inset-y-0 left-0 z-50 w-64 md:w-72 lg:w-80 bg-white shadow-lg transition-transform duration-300 ease-in-out lg:static lg:translate-x-0",
-          sidebarOpen ? "translate-x-0" : "-translate-x-full",
+          sidebarOpen ? "translate-x-0" : "-translate-x-full"
         )}
       >
         {/* Sidebar Header */}
@@ -82,7 +99,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                   "flex items-center rounded-md px-3 py-2 text-sm font-medium transition-colors",
                   pathname === item.href
                     ? "bg-primary/10 text-primary"
-                    : "text-gray-700 hover:bg-gray-100 hover:text-primary",
+                    : "text-gray-700 hover:bg-gray-100 hover:text-primary"
                 )}
               >
                 <item.icon className="mr-3 h-4 w-4" />
@@ -119,7 +136,9 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             >
               <Menu className="h-5 w-5" />
             </Button>
-            <h1 className="text-xl font-semibold text-gray-900">Panel de Administración</h1>
+            <h1 className="text-xl font-semibold text-gray-900">
+              Panel de Administración
+            </h1>
             <div className="w-10 lg:hidden"></div> {/* Spacer for mobile */}
           </div>
         </header>
@@ -128,6 +147,5 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         <main className="flex-1 overflow-auto p-6 bg-gray-50">{children}</main>
       </div>
     </div>
-  )
+  );
 }
-
