@@ -25,7 +25,6 @@ export function EditItemDialog({
   onCancel,
 }: EditItemDialogProps) {
   const [editedItem, setEditedItem] = useState<BannerAndPopUp | null>(item);
-  const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     setEditedItem(item);
@@ -62,7 +61,7 @@ export function EditItemDialog({
         <DialogHeader>
           <DialogTitle>Editar {editedItem.Title}</DialogTitle>
         </DialogHeader>
-        <div className="grid gap-4 py-4">
+        <form autoComplete="off" className="grid gap-4 py-4">
           <div className="grid grid-cols-4 items-center gap-4">
             <Label htmlFor="edit-title" className="text-right">
               Título
@@ -114,7 +113,7 @@ export function EditItemDialog({
               }
             />
           </div>
-        </div>
+        </form>
         <DialogFooter>
           <Button type="button" variant="secondary" onClick={onCancel}>
             Cancelar

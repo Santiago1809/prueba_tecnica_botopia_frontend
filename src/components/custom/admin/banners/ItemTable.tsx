@@ -15,7 +15,7 @@ import Image from "next/image";
 interface ItemTableProps {
   items: BannerAndPopUp[];
   onToggle: (id: number) => void;
-  onDelete: (id: number) => void;
+  onDelete: (id: string) => void;
   onEdit: (item: BannerAndPopUp) => void;
 }
 
@@ -74,7 +74,7 @@ export function ItemTable({
                 <Button
                   variant="outline"
                   size="icon"
-                  onClick={() => onDelete(item.id)}
+                  onClick={() => onDelete(item.documentId)}
                 >
                   <Trash2 className="h-4 w-4" />
                 </Button>

@@ -73,3 +73,51 @@ export async function saveBanner(token: string, banner: FormData) {
     return false;
   }
 }
+
+export async function updateBanner(
+  token: String,
+  banner: Partial<BannerAndPopUp>
+) {
+  try {
+    const response = await fetch(
+      `${BACKEND_HOST}/api/banners/${banner.documentId}`,
+      {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          data: {
+            Title: banner.Title,
+            Url: banner.Url,
+            ButtonText: banner.ButtonText,
+            Active: banner.Active,
+          },
+        }),
+      }
+    );
+    if (!response.ok) {
+      throw new Error("Error updating banner");
+    }
+    return true;
+  } catch (error) {
+    return false;
+  }
+}
+export async function deleteBanner(token: string, documentId: string) {
+  try {
+    const response = await fetch(`${BACKEND_HOST}/api/banners/${documentId}`, {
+      method: "DELETE",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    if (!response.ok) {
+      throw new Error("Error deleting banner");
+    }
+    return true;
+  } catch (error) {
+    return false;
+  }
+}
