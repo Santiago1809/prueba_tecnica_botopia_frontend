@@ -1,11 +1,10 @@
+import Footer from "@/components/custom/Footer";
+import Header from "@/components/custom/Header";
+import { Toaster } from "@/components/ui/toaster";
+import { BACKEND_HOST } from "@/lib/constants";
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
-import { Toaster } from "@/components/ui/toaster";
-import Header from "@/components/custom/Header";
-import Footer from "@/components/custom/Footer";
-import Chatbot from "@/components/custom/Chatbot";
-import { BACKEND_HOST } from "@/lib/constants";
 const interSans = Inter({
   variable: "--font-geist-sans",
   subsets: ["latin"],
@@ -49,7 +48,6 @@ export default function RootLayout({
           <Header />
           <main className="flex-grow">{children}</main>
           <Footer />
-          <Chatbot />
         </div>
         <Toaster />
       </body>

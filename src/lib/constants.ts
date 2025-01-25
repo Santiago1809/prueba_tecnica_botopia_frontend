@@ -7,4 +7,5 @@ export const {
   PAYPAL_CLIENT_ID,
   PAYPAL_SECRET,
   HOST_LOCAL = "http://localhost:3000",
+  BACKEND_TOKEN_AI
 } = process.env;

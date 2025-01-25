@@ -1,3 +1,4 @@
+import { Badge } from "@/components/ui/badge";
 import {
   Table,
   TableBody,
@@ -6,19 +7,9 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Badge } from "@/components/ui/badge";
-import { format } from "date-fns";
-import { Button } from "@/components/ui/button";
-import { Order } from "@/types/order";
 import { CopFormatNumber } from "@/lib/utils";
-
-interface Purchase {
-  id: number;
-  date: Date;
-  total: number;
-  status: string;
-  items: number;
-}
+import { Order } from "@/types/order";
+import { format } from "date-fns";
 interface Props {
   purchases: Order[]
 }
@@ -28,6 +19,7 @@ export function PurchaseHistoryTable({ purchases }: Props) {
     <Table>
       <TableHeader>
         <TableRow>
+          <TableHead>ID pedido</TableHead>
           <TableHead>Fecha</TableHead>
           <TableHead>Total</TableHead>
           <TableHead>Artículos</TableHead>
@@ -37,6 +29,7 @@ export function PurchaseHistoryTable({ purchases }: Props) {
       <TableBody>
         {purchases.map((purchase) => (
           <TableRow key={purchase.id}>
+            <TableCell>{purchase.id}</TableCell>
             <TableCell>{format(purchase.createdAt, "dd/MM/yyyy")}</TableCell>
             <TableCell>{CopFormatNumber(purchase.TotalPrice)}</TableCell>
             <TableCell>
