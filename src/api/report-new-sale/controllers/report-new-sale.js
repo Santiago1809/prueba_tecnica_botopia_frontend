@@ -20,7 +20,6 @@ module.exports = {
             email: sendingData.email,
           },
         });
-      console.log(user);
 
       await strapi.entityService.create("api::order.order", {
         data: {
