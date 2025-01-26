@@ -48,6 +48,10 @@ export default function BannersPage() {
   };
 
   const handleNewItemSubmit = async (newItem: FormData) => {
+    toast({
+      title: "Elemento enviado",
+      description: "El nuevo elemento está creandose.",
+    });
     await saveBanner(token, newItem);
     const res = await getBanners(token);
     setBanners(res);

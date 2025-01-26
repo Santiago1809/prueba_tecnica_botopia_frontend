@@ -148,7 +148,7 @@ export default function ProductTable() {
     }
   };
 
-  const handleUpdate = async (updatedProduct: Product) => {
+  const handleUpdate = async (updatedProduct: Partial<Product>) => {
     setIsLoading(true);
     try {
       // Simulate API call
@@ -199,7 +199,7 @@ export default function ProductTable() {
             <SelectItem value="20">20 por página</SelectItem>
           </SelectContent>
         </Select>
-        <Link href='/admin/products/new'>
+        <Link href="/admin/products/new">
           <Button>
             <Plus className="h-4 w-4 mr-2" />
             Nuevo Producto
@@ -330,7 +330,6 @@ export default function ProductTable() {
           open={isDialogOpen}
           onOpenChange={setIsDialogOpen}
           onUpdate={handleUpdate}
-          isLoading={isLoading}
         />
       )}
 

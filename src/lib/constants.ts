@@ -1,7 +1,7 @@
 export const {
-  BACKEND_HOST = 'http://localhost:1337',
+  BACKEND_HOST = 'https://botopia-backend.onrender.com',
   CLIENT_TOKEN,
-  NEXT_PUBLIC_BACKEND_HOST = 'http://localhost:1337',
+  NEXT_PUBLIC_BACKEND_HOST = 'https://botopia-backend.onrender.com',
   NEXT_PUBLIC_PRUEBA,
   STRIPE_KEY,
   PAYPAL_CLIENT_ID,

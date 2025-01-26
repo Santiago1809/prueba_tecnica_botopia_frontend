@@ -1,3 +1,4 @@
+"use server";
 import { BACKEND_HOST } from "@/lib/constants";
 import { Stats } from "@/types/admin";
 
