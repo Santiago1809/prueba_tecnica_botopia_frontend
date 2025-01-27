@@ -57,8 +57,16 @@ type RegisterValues = z.infer<typeof registerSchema>;
 export default function RegisterPage() {
   const router = useRouter();
   const { toast } = useToast();
-  const { setName, setAuth, setIsLoggedIn, setToken, isLoggedIn } =
-    useAuthStore();
+  const {
+    setName,
+    setAuth,
+    setIsLoggedIn,
+    setToken,
+    isLoggedIn,
+    setEmail,
+    setId,
+    setUserName,
+  } = useAuthStore();
   useEffect(() => {
     if (isLoggedIn) {
       router.push("/");
@@ -67,20 +75,23 @@ export default function RegisterPage() {
 
   const [error, registerAction, isPending] = useActionState(
     async (prevState: string | null, formData: FormData) => {
-      const response = await register(prevState, formData);
+      const res = await register(prevState, formData);
 
-      if (response?.error) {
-        return response.error;
+      if (res?.error) {
+        return res.error;
       }
 
-      if (!response?.jwt || !response?.userData) {
+      if (!res?.jwt || !res?.userData) {
         return "Error en el proceso de registro";
       }
 
       setIsLoggedIn(true);
-      setAuth(response.userData.user_role === "ADMIN");
-      setToken(response.jwt);
-      setName(response.userData.username);
+      setToken(res?.jwt);
+      setAuth(res?.userData?.user_role === "ADMIN");
+      setName(res?.userData?.display_name);
+      setEmail(res?.userData?.email);
+      setUserName(res?.userData?.username);
+      setId(res?.userData?.id);
 
       toast({
         title: "Registro exitoso",
