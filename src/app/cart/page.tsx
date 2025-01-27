@@ -49,7 +49,7 @@ export default function CartPage() {
             {cart.map((item) => (
               <Card key={item.id} className="mb-4">
                 <CardContent className="p-4">
-                  <div className="flex flex-col sm:flex-row items-start sm:items-center space-y-4 sm:space-y-0 sm:space-x-4 size-20">
+                  <div className="flex flex-col sm:flex-row items-start sm:items-center space-y-4 sm:space-y-0 sm:space-x-4 max-w-20 max-h-20">
                     <Image
                       src={item.imageUrl}
                       alt={item.name}
