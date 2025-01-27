@@ -4,6 +4,7 @@ import Stripe from "stripe";
 import paypal from "@paypal/checkout-server-sdk";
 import {
   BACKEND_HOST,
+  HOST_LOCAL,
   PAYPAL_CLIENT_ID,
   PAYPAL_SECRET,
   STRIPE_KEY,
@@ -70,7 +71,7 @@ export async function POST(request) {
         ),
         totalPrice,
       },
-      success_url: "http://localhost:3000/success",
+      success_url: `${HOST_LOCAL}/success`,
     });
 
     return NextResponse.json(session);

@@ -18,9 +18,9 @@ import { X } from "lucide-react";
 import { useCartStore } from "@/store/cartStore";
 
 export default function CartPage() {
-  const {cart, updateQuantity, removeItem, totalPrice} = useCartStore()
+  const { cart, updateQuantity, removeItem, totalPrice } = useCartStore();
 
-  const costOfSending = totalPrice > 50000 ? 0 : totalPrice*0.35
+  const costOfSending = totalPrice > 50000 ? 0 : totalPrice * 0.35;
 
   const handleUpdateQuantity = (id: number, newQuantity: number) => {
     if (newQuantity >= 1) {
@@ -53,9 +53,9 @@ export default function CartPage() {
                     <Image
                       src={item.imageUrl}
                       alt={item.name}
-                      width={80}
-                      height={80}
+                      fill
                       className="rounded-md"
+                      priority
                     />
                     <div className="flex-grow">
                       <CardTitle className="text-lg mb-2">
