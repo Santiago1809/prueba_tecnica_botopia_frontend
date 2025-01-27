@@ -1,6 +1,5 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Card, CardContent } from "@/components/ui/card"
-import { StarIcon } from "lucide-react"
 import type { Review } from "@/types/review"
 import { formatDistanceToNow } from "date-fns"
 import { es } from "date-fns/locale"

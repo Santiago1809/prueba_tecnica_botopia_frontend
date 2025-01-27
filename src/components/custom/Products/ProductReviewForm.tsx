@@ -37,7 +37,7 @@ export default function ReviewForm({ setReviews }: Props) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
   const { id } = useParams();
-  const { token, user_id } = useAuthStore();
+  const { token, email } = useAuthStore();
 
   const form = useForm<ReviewFormValues>({
     resolver: zodResolver(reviewSchema),
@@ -49,7 +49,7 @@ export default function ReviewForm({ setReviews }: Props) {
   const handleSubmit = async (data: ReviewFormValues) => {
     setIsSubmitting(true);
     try {
-      const reviews = await createReview(token, id as string, data.text, user_id);
+      const reviews = await createReview(token, id as string, data.text, email);
       setReviews(reviews);
       form.reset();
       toast({

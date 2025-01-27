@@ -18,7 +18,7 @@ export async function createReview(
   token: string,
   productId: string,
   text: string,
-  user_id: number
+  user_email: string
 ): Promise<Review[]> {
   try {
     const response = await fetch(`${BACKEND_HOST}/api/reviews`, {
@@ -31,7 +31,7 @@ export async function createReview(
         data: {
           product: productId,
           Text: text,
-          user: user_id
+          user: user_email
         },
       }),
     });
