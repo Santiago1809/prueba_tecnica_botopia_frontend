@@ -90,7 +90,6 @@ export async function getOrders(token: string) {
   return data;
 }
 export async function updateOrderStage(token: string, order: Order) {
-  console.log({ order });
 
   const response = await fetch(
     `${BACKEND_HOST}/api/orders/${order.documentId}`,

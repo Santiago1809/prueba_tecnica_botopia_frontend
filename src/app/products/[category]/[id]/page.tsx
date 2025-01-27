@@ -21,7 +21,7 @@ export default function ProductPage({
   const resolvedParams = use(params);
   const [product, setProduct] = useState<Product | null>();
   const id = resolvedParams.id;
-  const { user_id } = useAuthStore();
+  const { email } = useAuthStore();
 
   useEffect(() => {
     const getProduct = async () => {
@@ -35,7 +35,7 @@ export default function ProductPage({
     getProduct();
   }, [id]);
   useEffect(() => {
-    insertView(id, user_id);
+    insertView(id, email);
   }, [id]);
 
   return (

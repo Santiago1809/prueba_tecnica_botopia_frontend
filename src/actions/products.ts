@@ -6,12 +6,8 @@ import {
   Product,
 } from "@/types/products";
 
-export const insertView = async (id: string, user_id: number | string) => {
-  const data =
-    typeof user_id === "number"
-      ? { data: { user: user_id, product: id } }
-      : { data: { product: id } };
-
+export const insertView = async (id: string, user_email: number | string) => {
+  const data = { data: { user: user_email, product: id } };
   await fetch(`${BACKEND_HOST}/api/views`, {
     method: "POST",
     headers: {

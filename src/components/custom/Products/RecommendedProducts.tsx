@@ -13,7 +13,6 @@ export default function RecommendedProducts() {
   useEffect(() => {
     (async () => {
       const products = await getRecommendedProducts(token);
-      console.log(products);
       setFeaturedProducts(products);
     })();
   }, []);
