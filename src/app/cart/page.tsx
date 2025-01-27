@@ -54,8 +54,7 @@ export default function CartPage() {
                       <Image
                         src={item.imageUrl}
                         alt={item.name}
-                        fill
-                        className="rounded-md"
+                        className="rounded-md object-cover"
                       />
                     </div>
                     <div className="flex-grow">
