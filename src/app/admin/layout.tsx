@@ -2,6 +2,7 @@
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { cn } from "@/lib/utils";
+import { useAuthStore } from "@/store/authStore";
 import {
   LayoutDashboard,
   LogOut,
@@ -14,7 +15,7 @@ import {
   X,
 } from "lucide-react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useState } from "react";
 
 interface SidebarItem {
@@ -64,6 +65,13 @@ export default function AdminLayout({
 }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const pathname = usePathname();
+  const router = useRouter();
+  const { logOut } = useAuthStore();
+
+  const handleLogOut = () => {
+    logOut();
+    router.push("/");
+  };
 
   return (
     <div className="flex min-h-screen bg-gray-100">
@@ -114,7 +122,7 @@ export default function AdminLayout({
           <Button
             variant="outline"
             className="w-full justify-start text-sm"
-            onClick={() => console.log("Cerrar sesión")}
+            onClick={handleLogOut}
           >
             <LogOut className="mr-2 h-4 w-4" />
             Cerrar sesión
