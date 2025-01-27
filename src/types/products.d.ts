@@ -11,7 +11,7 @@ export interface Product {
 
 export interface Category {
   id?: number;
-  documentId?: string;
+  documentId: string;
   Name: string;
 }
 export interface ExternalCategoryData {

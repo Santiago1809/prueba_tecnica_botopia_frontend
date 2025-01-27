@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -19,6 +19,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Product } from "@/types/products";
+import Loader from "@/components/Loader";
 
 const formSchema = z.object({
   id: z.number(),
@@ -44,6 +45,7 @@ export default function EditProductDialog({
   onOpenChange,
   onUpdate,
 }: EditProductDialogProps) {
+  const [isLoading, setIsLoading] = useState(false);
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -73,7 +75,9 @@ export default function EditProductDialog({
       ...values,
       documentId: product.documentId, // Asegurarse de que documentId se pase correctamente
     };
+    setIsLoading(true);
     onUpdate(updatedProduct);
+    setIsLoading(false);
   };
 
   return (
@@ -124,7 +128,7 @@ export default function EditProductDialog({
               )}
             />
             <Button type="submit" className="w-full">
-              Guardar cambios
+              {isLoading ? <Loader size="sm" /> : "Guardar"}
             </Button>
           </form>
         </Form>

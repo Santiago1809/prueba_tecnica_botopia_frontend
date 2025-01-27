@@ -18,13 +18,15 @@ import { createProduct } from "@/actions/products";
 import { useAuthStore } from "@/store/authStore";
 import { Category } from "@/types/products";
 import { getCategories } from "@/actions/category";
+import Loader from "@/components/Loader"; // Suponiendo que tienes un componente Loader
 
 export default function NewProductPage() {
   const { toast } = useToast();
   const router = useRouter();
   const { token } = useAuthStore();
-  const [categories, setCategories] = useState<Category[]>([]); // Lista de categorías
-  const [selectedCategory, setSelectedCategory] = useState<string | null>(null); // Categoría seleccionada
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [isLoadingCategories, setIsLoadingCategories] = useState(true); // Indicador de carga
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [formData, setFormData] = useState({
     Name: "",
     Price: "",
@@ -34,11 +36,21 @@ export default function NewProductPage() {
   const [imageFiles, setImageFiles] = useState<File[]>([]);
   const [imagePreviews, setImagePreviews] = useState<string[]>([]);
 
-  // Simula obtener las categorías desde una API
   useEffect(() => {
     async function fetchCategories() {
-      const response = await getCategories();
-      setCategories(response);
+      try {
+        setIsLoadingCategories(true);
+        const response = await getCategories();
+        setCategories(response);
+      } catch (error) {
+        toast({
+          title: "Error al cargar categorías",
+          description: "No se pudieron cargar las categorías.",
+          variant: "destructive",
+        });
+      } finally {
+        setIsLoadingCategories(false);
+      }
     }
     fetchCategories();
   }, []);
@@ -55,7 +67,6 @@ export default function NewProductPage() {
       const files = Array.from(e.target.files);
       setImageFiles(files);
 
-      // Crear previews para las imágenes
       const previews = files.map((file) => URL.createObjectURL(file));
       setImagePreviews(previews);
     }
@@ -73,7 +84,6 @@ export default function NewProductPage() {
       return;
     }
 
-    // Crear FormData
     const data = {
       ...formData,
       Category: selectedCategory,
@@ -160,18 +170,28 @@ export default function NewProductPage() {
           </div>
           <div>
             <Label htmlFor="category">Categoría</Label>
-            <Select onValueChange={(value) => setSelectedCategory(value)}>
-              <SelectTrigger>
-                <SelectValue placeholder="Selecciona una categoría" />
-              </SelectTrigger>
-              <SelectContent>
-                {categories.map((category) => (
-                  <SelectItem key={category.id} value={(category.id as number).toString()}>
-                    {category.Name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            {isLoadingCategories ? (
+              <div className="flex items-center gap-2">
+                <Loader /> {/* Componente de loader */}
+                <span className="text-gray-500">Cargando categorías...</span>
+              </div>
+            ) : (
+              <Select onValueChange={(value) => setSelectedCategory(value)}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Selecciona una categoría" />
+                </SelectTrigger>
+                <SelectContent>
+                  {categories.map((category, index) => (
+                    <SelectItem
+                      key={category.id}
+                      value={category.Name}
+                    >
+                      {category.Name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            )}
           </div>
         </fieldset>
 

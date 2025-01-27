@@ -153,7 +153,7 @@ export async function createProduct(data: FormData, token: string) {
     if (!response.ok) throw new Error(`Error ${response}`);
     return true;
   } catch (err) {
-    console.error("Error creating product:");
+    console.error("Error creating product:", JSON.stringify(err));
     return false;
   }
 }
@@ -192,13 +192,10 @@ export async function updateProduct(product: any, token: string) {
       }
     );
     if (!response.ok) throw new Error(JSON.stringify(await response.json()));
-    console.log(product);
 
     return true;
   } catch (err) {
-    console.error(
-      (err as Error).message
-    );
+    console.error((err as Error).message);
     return false;
   }
 }
