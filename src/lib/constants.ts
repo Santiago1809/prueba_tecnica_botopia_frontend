@@ -6,6 +6,6 @@ export const {
   STRIPE_KEY,
   PAYPAL_CLIENT_ID,
   PAYPAL_SECRET,
-  HOST_LOCAL = "http://localhost:3000",
+  HOST_LOCAL = "https://botoshop.vercel.app",
   BACKEND_TOKEN_AI
 } = process.env;
